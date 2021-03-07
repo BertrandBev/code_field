@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:highlight/highlight.dart';
+import 'package:highlight/highlight_core.dart';
 
 class CodeController extends TextEditingController {
   final Mode language;
@@ -14,10 +14,6 @@ class CodeController extends TextEditingController {
   RegExp styleRegExp;
 
   /// Creates a CodeController instance
-  ///
-  /// [text] is the initial code 
-  /// [language] is a highlight language
-  /// [theme] is a highlight theme
   CodeController({
     String text,
     this.language,

@@ -1,4 +1,4 @@
-import 'package:code_field/code_controller.dart';
+import 'package:code_text_field/code_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
@@ -19,6 +19,9 @@ class LineNumberStyle {
 }
 
 class CodeField extends StatefulWidget {
+  final int minLines;
+  final int maxLines;
+  final bool expands;
   final CodeController controller;
   final LineNumberStyle lineNumberStyle;
   final Color background;
@@ -31,6 +34,9 @@ class CodeField extends StatefulWidget {
   const CodeField({
     Key key,
     @required this.controller,
+    this.minLines,
+    this.maxLines,
+    this.expands = false,
     this.background,
     this.decoration,
     this.textStyle,
@@ -87,21 +93,28 @@ class _CodeFieldState extends State<CodeField> {
     // Default color scheme
     const ROOT_KEY = 'root';
     final theme = widget.controller.theme;
-    final backgroundCol = widget.background ??
+    var backgroundCol = widget.background ??
         theme[ROOT_KEY]?.backgroundColor ??
         Colors.grey.shade900;
-    final textStyle = widget.textStyle ??
-        TextStyle(
-          color: theme[ROOT_KEY]?.color ?? Colors.grey.shade800,
-        );
-    final numberTextStyle = widget.lineNumberStyle.textStyle ??
-        TextStyle(
-          color:
-              (theme[ROOT_KEY]?.color ?? Colors.grey.shade800).withOpacity(0.7),
-          fontSize: textStyle.fontSize,
-        );
+    if (widget.decoration != null) {
+      backgroundCol = null;
+    }
+    TextStyle textStyle = widget.textStyle ?? TextStyle();
+    if (textStyle.color == null)
+      textStyle = textStyle.copyWith(
+          color: theme[ROOT_KEY]?.color ?? Colors.grey.shade800);
+    TextStyle numberTextStyle = widget.lineNumberStyle.textStyle ?? TextStyle();
+    final numberColor =
+        (theme[ROOT_KEY]?.color ?? Colors.grey.shade800).withOpacity(0.7);
+    // Copy important attributes
+    numberTextStyle = numberTextStyle.copyWith(
+      color: numberTextStyle.color ?? numberColor,
+      fontSize: textStyle.fontSize,
+      fontFamily: textStyle.fontFamily,
+    );
     final cursorColor =
         widget.cursorColor ?? theme[ROOT_KEY]?.color ?? Colors.grey.shade800;
+    
 
     final numberCol = Container(
       width: widget.lineNumberStyle.width,
@@ -111,8 +124,9 @@ class _CodeFieldState extends State<CodeField> {
         style: numberTextStyle,
         controller: _numberController,
         enabled: false,
-        expands: true,
-        maxLines: null,
+        minLines: widget.minLines,
+        maxLines: widget.maxLines,
+        expands: widget.expands,
         scrollController: _numberScroll,
         decoration: InputDecoration(
           disabledBorder: InputBorder.none,
@@ -128,8 +142,9 @@ class _CodeFieldState extends State<CodeField> {
         child: TextField(
           style: textStyle,
           controller: widget.controller,
-          expands: true,
-          maxLines: null,
+          minLines: widget.minLines,
+          maxLines: widget.maxLines,
+          expands: widget.expands,
           scrollController: _codeScroll,
           decoration: InputDecoration(
             disabledBorder: InputBorder.none,
