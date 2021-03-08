@@ -4,18 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:highlight/highlight_core.dart';
 
 class CodeController extends TextEditingController {
-  final Mode language;
-  final Map<String, TextStyle> theme;
-  final Map<String, TextStyle> patternMap;
-  final Map<String, TextStyle> stringMap;
+  final Mode? language;
+  final Map<String, TextStyle>? theme;
+  final Map<String, TextStyle>? patternMap;
+  final Map<String, TextStyle>? stringMap;
   final String languageId = genId();
   // Computed members
   final styleList = <TextStyle>[];
-  RegExp styleRegExp;
+  RegExp? styleRegExp;
 
   /// Creates a CodeController instance
   CodeController({
-    String text,
+    String? text,
     this.language,
     this.theme,
     this.patternMap,
@@ -26,7 +26,7 @@ class CodeController extends TextEditingController {
       throw Exception("A theme must be provided for language parsing");
     if (language != null) {
       // Register language
-      highlight.registerLanguage(languageId, language);
+      highlight.registerLanguage(languageId, language!);
     }
   }
 
@@ -39,32 +39,33 @@ class CodeController extends TextEditingController {
     );
   }
 
-  TextSpan _processPatterns(String text, TextStyle style) {
+  TextSpan _processPatterns(String text, TextStyle? style) {
     final children = <TextSpan>[];
     text.splitMapJoin(
-      styleRegExp,
+      styleRegExp!,
       onMatch: (Match m) {
+        if (styleList.isEmpty) return '';
         int idx;
         for (idx = 1;
             idx < m.groupCount &&
                 idx <= styleList.length &&
                 m.group(idx) == null;
-            idx++);
+            idx++) {}
         children.add(TextSpan(
           text: m[0],
           style: styleList[idx - 1],
         ));
-        return null;
+        return '';
       },
       onNonMatch: (String span) {
         children.add(TextSpan(text: span, style: style));
-        return null;
+        return '';
       },
     );
     return TextSpan(style: style, children: children);
   }
 
-  TextSpan _processLanguage(String text, TextStyle style) {
+  TextSpan _processLanguage(String text, TextStyle? style) {
     final result = highlight.parse(text, language: languageId);
 
     final nodes = result.nodes;
@@ -74,31 +75,36 @@ class CodeController extends TextEditingController {
     final stack = <List<TextSpan>>[];
 
     void _traverse(Node node) {
-      if (node.value != null) {
-        var child = TextSpan(text: node.value, style: theme[node.className]);
+      final val = node.value;
+      final nodeChildren = node.children;
+      if (val != null) {
+        var child = TextSpan(text: val, style: theme?[node.className]);
         if (styleRegExp != null)
-          child = _processPatterns(node.value, theme[node.className]);
+          child = _processPatterns(val, theme?[node.className]);
         currentSpans.add(child);
-      } else if (node.children != null) {
+      } else if (nodeChildren != null) {
         List<TextSpan> tmp = [];
-        currentSpans.add(TextSpan(children: tmp, style: theme[node.className]));
+        currentSpans.add(TextSpan(
+          children: tmp,
+          style: theme?[node.className],
+        ));
         stack.add(currentSpans);
         currentSpans = tmp;
-        node.children.forEach((n) {
+        nodeChildren.forEach((n) {
           _traverse(n);
-          if (n == node.children.last) {
+          if (n == nodeChildren.last) {
             currentSpans = stack.isEmpty ? children : stack.removeLast();
           }
         });
       }
     }
 
-    for (var node in nodes) _traverse(node);
+    if (nodes != null) for (var node in nodes) _traverse(node);
     return TextSpan(style: style, children: children);
   }
 
   @override
-  TextSpan buildTextSpan({TextStyle style, bool withComposing}) {
+  TextSpan buildTextSpan({TextStyle? style, bool? withComposing}) {
     // final pattern = r"((a)b)|((c)(d))";
     // final re = RegExp(pattern);
     // final m = re.firstMatch("cd");
@@ -108,13 +114,13 @@ class CodeController extends TextEditingController {
 
     // Retrieve pattern regexp
     final patternList = <String>[];
-    if (patternMap != null) {
-      patternList.addAll(patternMap.keys.map((e) => "(" + e + ")"));
-      styleList.addAll(patternMap.values);
-    }
     if (stringMap != null) {
-      patternList.addAll(stringMap.keys.map((e) => r'(\b' + e + r'\b)'));
-      styleList.addAll(stringMap.values);
+      patternList.addAll(stringMap!.keys.map((e) => r'(\b' + e + r'\b)'));
+      styleList.addAll(stringMap!.values);
+    }
+    if (patternMap != null) {
+      patternList.addAll(patternMap!.keys.map((e) => "(" + e + ")"));
+      styleList.addAll(patternMap!.values);
     }
     print(patternList.join('|'));
     styleRegExp = RegExp(patternList.join('|'), multiLine: true);

@@ -1,7 +1,6 @@
 import 'package:example/code_snippets.dart';
 import 'package:example/themes.dart';
 import 'package:flutter/material.dart';
-import 'package:code_text_field/code_controller.dart';
 import 'package:code_text_field/code_field.dart';
 import 'package:highlight/languages/all.dart';
 
@@ -9,15 +8,16 @@ class CustomCodeBox extends StatefulWidget {
   final String language;
   final String theme;
 
-  const CustomCodeBox({Key key, this.language, this.theme}) : super(key: key);
+  const CustomCodeBox({Key? key, required this.language, required this.theme})
+      : super(key: key);
 
   @override
   _CustomCodeBoxState createState() => _CustomCodeBoxState();
 }
 
 class _CustomCodeBoxState extends State<CustomCodeBox> {
-  String language;
-  String theme;
+  String? language;
+  String? theme;
 
   @override
   void initState() {
@@ -26,7 +26,7 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
     theme = widget.theme;
   }
 
-  List<String> get languageList {
+  List<String?> get languageList {
     const TOP = <String>{
       "java",
       "cpp",
@@ -37,33 +37,34 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
       "haskell",
       "ruby",
     };
-    return <String>[
+    return <String?>[
       ...TOP,
       null, // Divider
       ...CODE_SNIPPETS.keys.where((el) => !TOP.contains(el))
     ];
   }
 
-  List<String> get themeList {
+  List<String?> get themeList {
     const TOP = <String>{
       "monokai-sublime",
+      "a11y-dark",
       "an-old-hope",
-      "atom-one-dark",
       "vs2015",
       "vs",
+      "atom-one-dark",
     };
-    return <String>[
+    return <String?>[
       ...TOP,
       null, // Divider
       ...THEMES.keys.where((el) => !TOP.contains(el))
     ];
   }
 
-  Widget buildDropdown(Iterable<String> choices, String value, IconData icon,
-      Function(String) onChanged) {
+  Widget buildDropdown(Iterable<String?> choices, String value, IconData icon,
+      Function(String?) onChanged) {
     return DropdownButton<String>(
       value: value,
-      items: choices.map((String value) {
+      items: choices.map((String? value) {
         return new DropdownMenuItem<String>(
           value: value,
           child: value == null
@@ -80,24 +81,25 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
   @override
   Widget build(BuildContext context) {
     final codeDropdown =
-        buildDropdown(languageList, language, Icons.code, (val) {
+        buildDropdown(languageList, language!, Icons.code, (val) {
       if (val == null) return;
       setState(() => language = val);
     });
     final themeDropdown =
-        buildDropdown(themeList, theme, Icons.color_lens, (val) {
+        buildDropdown(themeList, theme!, Icons.color_lens, (val) {
       if (val == null) return;
       setState(() => theme = val);
     });
     final dropdowns = Row(children: [
+      SizedBox(width: 12.0),
       codeDropdown,
       SizedBox(width: 12.0),
       themeDropdown,
     ]);
     final codeField = InnerField(
       key: ValueKey("$language - $theme"),
-      language: language,
-      theme: theme,
+      language: language!,
+      theme: theme!,
     );
     return Column(children: [
       dropdowns,
@@ -110,14 +112,15 @@ class InnerField extends StatefulWidget {
   final String language;
   final String theme;
 
-  const InnerField({Key key, this.language, this.theme}) : super(key: key);
+  const InnerField({Key? key, required this.language, required this.theme})
+      : super(key: key);
 
   @override
   _InnerFieldState createState() => _InnerFieldState();
 }
 
 class _InnerFieldState extends State<InnerField> {
-  CodeController _codeController;
+  CodeController? _codeController;
 
   @override
   void initState() {
@@ -143,14 +146,14 @@ class _InnerFieldState extends State<InnerField> {
 
   @override
   void dispose() {
-    _codeController.dispose();
+    _codeController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return CodeField(
-      controller: _codeController,
+      controller: _codeController!,
       textStyle: TextStyle(fontFamily: 'SourceCode'),
     );
   }

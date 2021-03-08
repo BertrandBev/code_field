@@ -1,8 +1,9 @@
 import 'package:example/custom_code_box.dart';
 import 'package:flutter/material.dart';
-import 'package:code_text_field/code_controller.dart';
-import 'package:highlight/languages/javascript.dart';
-import 'package:flutter_highlight/themes/monokai-sublime.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+import 'readme_examples.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,70 +17,50 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blueGrey,
       ),
-      home: HomePage(title: 'Code field demo page'),
+      home: HomePage(),
     );
   }
 }
 
 class HomePage extends StatefulWidget {
-  HomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
+  HomePage({Key? key}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  CodeController _codeController;
-
   @override
   void initState() {
     super.initState();
-    final String source = '''function myFunction(p1, p2) {
-    function inner(str) {
-      return "some string";
-    }
-    if (p1 == p2)
-      return 2 * p1 * p2;
-    else
-      return 0;
-}
-''';
-
-    _codeController = CodeController(
-      text: source,
-      patternMap: {
-        r"\B#[a-zA-Z0-9]+\b": TextStyle(color: Colors.red),
-        r"\B@[a-zA-Z0-9]+\b": TextStyle(
-          fontWeight: FontWeight.w800,
-          color: Colors.blue,
-        ),
-        r"\B![a-zA-Z0-9]+\b":
-            TextStyle(color: Colors.yellow, fontStyle: FontStyle.italic),
-      },
-      stringMap: {
-        "bev": TextStyle(color: Colors.indigo),
-      },
-      language: javascript,
-      theme: monokaiSublimeTheme,
-    );
   }
 
   @override
   void dispose() {
-    _codeController.dispose();
     super.dispose();
+  }
+
+  Future _launchInBrowser(String url) async {
+    if (await canLaunch(url)) {
+      await launch(
+        url,
+        forceSafariVC: false,
+        forceWebView: false,
+        headers: <String, String>{'my_header_key': 'my_header_value'},
+      );
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final preset = <String>[
       "dart|monokai-sublime",
-      "python|monokai",
+      "python|atom-one-dark",
       "cpp|an-old-hope",
       "java|a11y-dark",
-      "javascript|vs2015",
+      "javascript|vs",
     ];
     List<Widget> children = preset.map((e) {
       final parts = e.split('|');
@@ -95,19 +76,30 @@ class _HomePageState extends State<HomePage> {
     }).toList();
     final page = Center(
       child: Container(
-        constraints: BoxConstraints(maxWidth: 900),
-        child: Column(children: children),
+        constraints: BoxConstraints(maxWidth: 400),
+        padding: EdgeInsets.symmetric(vertical: 32.0),
+        // child: Column(children: children),
+        child: CodeEditor4(),
       ),
     );
     return Scaffold(
       backgroundColor: Color(0xFF363636),
       appBar: AppBar(
-        title: Text(widget.title),
+        backgroundColor: Color(0xff23241f),
+        title: Text("CodeField demo"),
+        centerTitle: false,
         actions: [
-          IconButton(
-            icon: Icon(Icons.code),
-            onPressed: () {},
+          TextButton.icon(
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              primary: Colors.white,
+            ),
+            icon: Icon(FontAwesomeIcons.github),
+            onPressed: () =>
+                _launchInBrowser("https://github.com/BertrandBev/code_field"),
+            label: Text("GITHUB"),
           ),
+          SizedBox(width: 8.0),
         ],
       ),
       body: SingleChildScrollView(child: page),
