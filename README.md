@@ -30,7 +30,7 @@ dependencies:
   code_text_field: <latest_version>
 ```
 
-[latest version]()
+[latest version](https://pub.dev/packages/code_text_field/install)
 
 In your library add the following import:
 
@@ -151,7 +151,8 @@ CodeField({
   this.background,
   this.decoration,
   this.textStyle,
-  this.padding = const EdgeInsets.all(8.0),
+  this.padding = const EdgeInsets.symmetric(horizontal: 8.0),
+  this.scrollPadding = const EdgeInsets.symmetric(vertical: 8.0),
   this.lineNumberStyle = const LineNumberStyle(),
   this.cursorColor,
   this.textSelectionTheme,
