@@ -7,6 +7,7 @@ import 'package:code_text_field/code_field.dart';
 // Import the language & theme
 import 'package:highlight/languages/dart.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
+import 'package:flutter_highlight/themes/a11y-dark.dart';
 
 class CodeEditor extends StatefulWidget {
   @override
@@ -105,6 +106,8 @@ class _CodeEditor3State extends State<CodeEditor3> {
     // Instantiate the CodeController
     _codeController = CodeController(
       text: source,
+      language: dart,
+      theme: monokaiSublimeTheme,
       patternMap: {
         r"\B#[a-zA-Z0-9]+\b":
             TextStyle(fontWeight: FontWeight.bold, color: Colors.purpleAccent),
@@ -173,8 +176,61 @@ class _CodeEditor4State extends State<CodeEditor4> {
       ),
       lineNumberStyle: LineNumberStyle(
           textStyle: TextStyle(
-        // color: Colors.grey.shade500,
-      )),
+              // color: Colors.grey.shade500,
+              )),
+    );
+  }
+}
+
+/*
+ * Android screen
+ */
+
+class CodeEditor5 extends StatefulWidget {
+  @override
+  _CodeEditor5State createState() => _CodeEditor5State();
+}
+
+class _CodeEditor5State extends State<CodeEditor5> {
+  CodeController? _codeController;
+
+  @override
+  void initState() {
+    super.initState();
+    final source = """// An expensive but pretty
+// recursive implementation
+int fibonacci(int n) {
+  if (n <= 1) return n;
+  return fibonacci(n - 1)
+    + fibonacci(n - 2);
+}
+
+void main() {
+  print("Fibonacci sequence:");
+  for (var n = 0; n < 10; n++)
+    print(fibonacci(n));
+}
+""";
+    // Instantiate the CodeController
+    _codeController = CodeController(
+      text: source,
+      language: dart,
+      theme: a11yDarkTheme,
+    );
+  }
+
+  @override
+  void dispose() {
+    _codeController?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CodeField(
+      controller: _codeController!,
+      textStyle: TextStyle(fontFamily: 'SourceCode'),
+      expands: true,
     );
   }
 }

@@ -1,9 +1,9 @@
 import 'package:example/custom_code_box.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+// ignore: import_of_legacy_library_into_null_safe
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
-import 'readme_examples.dart';
+import 'readme/readme_examples.dart';
 
 void main() {
   runApp(MyApp());
@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Code field',
       theme: ThemeData(
         primarySwatch: Colors.blueGrey,
@@ -79,14 +80,15 @@ class _HomePageState extends State<HomePage> {
         constraints: BoxConstraints(maxWidth: 400),
         padding: EdgeInsets.symmetric(vertical: 32.0),
         // child: Column(children: children),
-        child: CodeEditor4(),
+        // child: CodeEditor4(),
       ),
     );
     return Scaffold(
       backgroundColor: Color(0xFF363636),
       appBar: AppBar(
         backgroundColor: Color(0xff23241f),
-        title: Text("CodeField demo"),
+        // title: Text("CodeField demo"),
+        title: Text("Recursive Fibonacci"),
         centerTitle: false,
         actions: [
           TextButton.icon(
@@ -102,7 +104,8 @@ class _HomePageState extends State<HomePage> {
           SizedBox(width: 8.0),
         ],
       ),
-      body: SingleChildScrollView(child: page),
+      // body: SingleChildScrollView(child: page),
+      body: CodeEditor5(),
     );
   }
 }

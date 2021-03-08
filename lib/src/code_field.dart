@@ -174,19 +174,17 @@ class _CodeFieldState extends State<CodeField> {
               child: Text(longestLine, style: textStyle),
             ),
           ),
-          codeField,
+          widget.expands ? Expanded(child: codeField) : codeField,
         ],
       ),
     );
-    final codeCol = Expanded(
-      child: Theme(
-        data: Theme.of(context).copyWith(
-          textSelectionTheme: widget.textSelectionTheme,
-        ),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: intrinsic,
-        ),
+    final codeCol = Theme(
+      data: Theme.of(context).copyWith(
+        textSelectionTheme: widget.textSelectionTheme,
+      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: intrinsic,
       ),
     );
     return Container(
@@ -194,9 +192,10 @@ class _CodeFieldState extends State<CodeField> {
       color: backgroundCol,
       padding: widget.padding,
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           numberCol,
-          codeCol,
+          Expanded(child: codeCol),
         ],
       ),
     );

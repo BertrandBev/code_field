@@ -92,7 +92,7 @@ packages:
       name: linked_scroll_controller
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.2"
+    version: "0.2.0-nullsafety.0"
   matcher:
     dependency: transitive
     description:
