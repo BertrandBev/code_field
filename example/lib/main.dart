@@ -77,7 +77,7 @@ class _HomePageState extends State<HomePage> {
     }).toList();
     final page = Center(
       child: Container(
-        constraints: BoxConstraints(maxWidth: 400),
+        constraints: BoxConstraints(maxWidth: 900),
         padding: EdgeInsets.symmetric(vertical: 32.0),
         child: Column(children: children),
         // child: CodeEditor4(),

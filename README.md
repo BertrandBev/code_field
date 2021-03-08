@@ -10,7 +10,7 @@ A customizable code text field supporting syntax highlighting
 
 ## Live demo
 
-A [live demo]() showcasing a few language / themes combinaisons 
+A [live demo](https://bertrandbev.github.io/code_field/#/) showcasing a few language / themes combinaisons 
 
 ## Features
 
