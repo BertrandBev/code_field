@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> {
       child: Container(
         constraints: BoxConstraints(maxWidth: 400),
         padding: EdgeInsets.symmetric(vertical: 32.0),
-        // child: Column(children: children),
+        child: Column(children: children),
         // child: CodeEditor4(),
       ),
     );
@@ -87,8 +87,8 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Color(0xFF363636),
       appBar: AppBar(
         backgroundColor: Color(0xff23241f),
-        // title: Text("CodeField demo"),
-        title: Text("Recursive Fibonacci"),
+        title: Text("CodeField demo"),
+        // title: Text("Recursive Fibonacci"),
         centerTitle: false,
         actions: [
           TextButton.icon(
@@ -104,8 +104,8 @@ class _HomePageState extends State<HomePage> {
           SizedBox(width: 8.0),
         ],
       ),
-      // body: SingleChildScrollView(child: page),
-      body: CodeEditor5(),
+      body: SingleChildScrollView(child: page),
+      // body: CodeEditor5(),
     );
   }
 }

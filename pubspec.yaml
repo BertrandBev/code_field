@@ -1,7 +1,6 @@
 name: code_text_field
-description: A customizable code text field supporting syntax highlighting
-version: 1.0.0
-author: Bertrand Bevillard
+description: A customizable code field supporting syntax highlighting
+version: 1.0.0-2
 homepage: https://github.com/BertrandBev/code_field
 
 environment:

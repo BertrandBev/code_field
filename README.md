@@ -2,11 +2,11 @@
 
 A customizable code text field supporting syntax highlighting
 
-[![Pub](https://img.shields.io/pub/v/flutter_staggered_grid_view.svg)](https://pub.dartlang.org/packages/flutter_staggered_grid_view)
-[![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://bertrandbev.github.io/eigen-js/#/)
+[![Pub](https://img.shields.io/pub/v/code_text_field.svg)](https://pub.dev/packages/code_text_field)
+[![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://bertrandbev.github.io/code_field/)
 [![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://raw.githubusercontent.com/BertrandBev/code_field/master/LICENSE)
 
-![Screenshot](https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/android.png)
+<img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/android.png" width="60%">
 
 ## Live demo
 
@@ -85,7 +85,7 @@ class _CodeEditorState extends State<CodeEditor> {
 }
 ```
 
-![Screenshot](https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/example_0.png)
+<img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/example_0.png" width="60%">
 
 Here, the monospace font [Source Code Pro](https://fonts.google.com/specimen/Source+Code+Pro?preview.text_type=custom) has been added to the assets folder and to the [pubspec.yaml](https://github.com/BertrandBev/code_field/blob/master/example/pubspec.yaml) file
 
@@ -103,7 +103,7 @@ _codeController = CodeController(
 );
 ```
 
-![Screenshot](https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/example_1.png)
+<img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/example_1.png" width="60%">
 
 More complex regexes may also be used with the **patternMap**. When a language is used though, its regexes patterns take precedence over **patternMap** and **stringMap**.
 
@@ -117,11 +117,9 @@ _codeController = CodeController(
 );
 ```
 
-![Screenshot](https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/example_2.png)
+<img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/example_2.png" width="60%">
 
 Both **patternMap** and **stringMap** can be used without specifying a language
-
-![Screenshot](https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/example_3.png)
 
 ```dart
 _codeController = CodeController(
@@ -136,6 +134,8 @@ _codeController = CodeController(
   },
 );
 ```
+
+<img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/example_3.png" width="60%">
 
 ## API
 
