@@ -1,20 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import './code_controller.dart';
 
+class LineNumberController extends TextEditingController {
+  final TextSpan Function(int, TextStyle?)? lineNumberBuilder;
+
+  LineNumberController(this.lineNumberBuilder);
+
+  @override
+  TextSpan buildTextSpan({TextStyle? style, bool? withComposing}) {
+    final children = <TextSpan>[];
+    text.split("\n").forEach((el) {
+      final number = int.parse(el);
+      var textSpan = TextSpan(text: el, style: style);
+      if (lineNumberBuilder != null)
+        textSpan = lineNumberBuilder!(number, style);
+      children.add(textSpan);
+      children.add(TextSpan(text: "\n"));
+    });
+    return TextSpan(children: children, style: style);
+  }
+}
+
 class LineNumberStyle {
   final double width;
   final TextAlign textAlign;
-  final EdgeInsets padding;
   final TextStyle? textStyle;
   final Color? background;
-
+  final double margin;
   const LineNumberStyle({
     this.width = 42.0,
     this.textAlign = TextAlign.right,
-    this.padding = const EdgeInsets.only(right: 10.0),
+    this.margin = 10.0,
     this.textStyle,
     this.background,
   });
@@ -28,11 +48,12 @@ class CodeField extends StatefulWidget {
   final LineNumberStyle lineNumberStyle;
   final Color? background;
   final EdgeInsets padding;
-  final EdgeInsets scrollPadding;
   final Decoration? decoration;
   final TextStyle? textStyle;
   final Color? cursorColor;
   final TextSelectionThemeData? textSelectionTheme;
+  final TextSpan Function(int, TextStyle?)? lineNumberBuilder;
+  final int tabSpaces;
 
   const CodeField({
     Key? key,
@@ -43,23 +64,24 @@ class CodeField extends StatefulWidget {
     this.background,
     this.decoration,
     this.textStyle,
-    this.padding = const EdgeInsets.symmetric(horizontal: 8.0),
-    this.scrollPadding = const EdgeInsets.symmetric(vertical: 8.0),
+    this.padding = const EdgeInsets.symmetric(),
     this.lineNumberStyle = const LineNumberStyle(),
     this.cursorColor,
     this.textSelectionTheme,
+    this.lineNumberBuilder,
+    this.tabSpaces = 2,
   }) : super(key: key);
 
   @override
-  _CodeFieldState createState() => _CodeFieldState();
+  CodeFieldState createState() => CodeFieldState();
 }
 
-class _CodeFieldState extends State<CodeField> {
+class CodeFieldState extends State<CodeField> {
 // Add a controller
   LinkedScrollControllerGroup? _controllers;
   ScrollController? _numberScroll;
   ScrollController? _codeScroll;
-  TextEditingController? _numberController;
+  LineNumberController? _numberController;
   //
   String? lines;
   String longestLine = "";
@@ -70,7 +92,7 @@ class _CodeFieldState extends State<CodeField> {
     _controllers = LinkedScrollControllerGroup();
     _numberScroll = _controllers?.addAndGet();
     _codeScroll = _controllers?.addAndGet();
-    _numberController = TextEditingController();
+    _numberController = LineNumberController(widget.lineNumberBuilder);
     widget.controller.addListener(_onTextChanged);
     _onTextChanged();
   }
@@ -84,12 +106,16 @@ class _CodeFieldState extends State<CodeField> {
     super.dispose();
   }
 
+  void rebuild() {
+    setState(() {});
+  }
+
   void _onTextChanged() {
     // Rebuild line number
     final str = widget.controller.text.split("\n");
     final buf = <String>[];
     for (var k = 0; k < str.length; k++) {
-      buf.add((k).toString());
+      buf.add((k + 1).toString());
     }
     _numberController?.text = buf.join("\n");
     // Find longest line
@@ -98,6 +124,19 @@ class _CodeFieldState extends State<CodeField> {
       if (line.length > longestLine.length) longestLine = line;
     });
     setState(() {});
+  }
+
+  void _insertStr(String str) {
+    String text = widget.controller.text;
+    TextSelection textSelection = widget.controller.selection;
+    String newText =
+        text.replaceRange(textSelection.start, textSelection.end, str);
+    final len = str.length;
+    widget.controller.text = newText;
+    widget.controller.selection = textSelection.copyWith(
+      baseOffset: textSelection.start + len,
+      extentOffset: textSelection.start + len,
+    );
   }
 
   @override
@@ -130,26 +169,34 @@ class _CodeFieldState extends State<CodeField> {
     final cursorColor =
         widget.cursorColor ?? theme?[ROOT_KEY]?.color ?? defaultText;
 
+    final lineNumberCol = TextField(
+      scrollPadding: widget.padding,
+      style: numberTextStyle,
+      controller: _numberController,
+      enabled: false,
+      minLines: widget.minLines,
+      maxLines: widget.maxLines,
+      expands: widget.expands,
+      scrollController: _numberScroll,
+      decoration: InputDecoration(
+        disabledBorder: InputBorder.none,
+      ),
+      textAlign: widget.lineNumberStyle.textAlign,
+    );
+
     final numberCol = Container(
       width: widget.lineNumberStyle.width,
-      padding: widget.lineNumberStyle.padding,
-      color: widget.lineNumberStyle.background,
-      child: TextField(
-        style: numberTextStyle,
-        controller: _numberController,
-        enabled: false,
-        minLines: widget.minLines,
-        maxLines: widget.maxLines,
-        expands: widget.expands,
-        scrollController: _numberScroll,
-        decoration: InputDecoration(
-          disabledBorder: InputBorder.none,
-        ),
-        textAlign: widget.lineNumberStyle.textAlign,
+      padding: EdgeInsets.only(
+        left: widget.padding.left,
+        right: widget.lineNumberStyle.margin / 2,
       ),
+      // padding: widget.lineNumberStyle.padding,
+      color: widget.lineNumberStyle.background,
+      child: lineNumberCol,
     );
+
     final codeField = TextField(
-      scrollPadding: widget.scrollPadding,
+      scrollPadding: widget.padding,
       style: textStyle,
       controller: widget.controller,
       minLines: widget.minLines,
@@ -165,19 +212,31 @@ class _CodeFieldState extends State<CodeField> {
       autocorrect: false,
       enableSuggestions: false,
     );
+
+    final codeFocus = Focus(
+      child: codeField,
+      onKey: (data, event) {
+        if (event.isKeyPressed(LogicalKeyboardKey.tab)) {
+          _insertStr(" " * widget.tabSpaces);
+          return true;
+        }
+        return false;
+      },
+    );
+
     final intrinsic = IntrinsicWidth(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.only(right: 16.0),
+            padding: const EdgeInsets.only(right: 16.0), // Add some buffer
             child: ConstrainedBox(
               constraints: BoxConstraints(maxHeight: 0.0),
               child: Text(longestLine, style: textStyle),
             ),
           ),
-          widget.expands ? Expanded(child: codeField) : codeField,
+          widget.expands ? Expanded(child: codeFocus) : codeFocus,
         ],
       ),
     );
@@ -186,6 +245,10 @@ class _CodeFieldState extends State<CodeField> {
         textSelectionTheme: widget.textSelectionTheme,
       ),
       child: SingleChildScrollView(
+        padding: EdgeInsets.only(
+          left: widget.lineNumberStyle.margin / 2,
+          right: widget.padding.right,
+        ),
         scrollDirection: Axis.horizontal,
         child: intrinsic,
       ),
@@ -193,7 +256,6 @@ class _CodeFieldState extends State<CodeField> {
     return Container(
       decoration: widget.decoration,
       color: backgroundCol,
-      padding: widget.padding,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
