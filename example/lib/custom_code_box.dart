@@ -1,7 +1,7 @@
 import 'package:example/code_snippets.dart';
 import 'package:example/themes.dart';
 import 'package:flutter/material.dart';
-import 'package:code_text_field/code_field.dart';
+import 'package:code_text_field/code_text_field.dart';
 import 'package:highlight/languages/all.dart';
 
 class CustomCodeBox extends StatefulWidget {

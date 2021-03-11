@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:code_text_field/code_field.dart';
+import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
 
 abstract class CodeModifier {
