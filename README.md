@@ -6,7 +6,7 @@ A customizable code text field supporting syntax highlighting
 [![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://bertrandbev.github.io/code_field/)
 [![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://raw.githubusercontent.com/BertrandBev/code_field/master/LICENSE)
 
-<img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/top.gif">
+<img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/top.gif" width="70%">
 
 ## Live demo
 
@@ -28,13 +28,13 @@ The dart VM [dlox](https://github.com/BertrandBev/dlox) uses **CodeField** in it
 
 Code modifiers help manage indents automatically
 
-<img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/typing.gif">
+<img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/typing.gif" width="70%">
 
 
 The editor is wrapped in a horizontal scrallable container to handle long lines
 
 
-<img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/long_line.gif">
+<img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/long_line.gif" width="70%">
 
 
 ## Installing
@@ -229,4 +229,4 @@ CodeController({
 ## Limitations
 
 - Autocomplete disabling on android [doesn't work yet](https://github.com/flutter/flutter/issues/71679)
-- The TextField cursor doesn't seem to be handling space inputs properly on the web platform. Pending issue resolution
+- The TextField cursor doesn't seem to be handling space inputs properly on the web platform. Pending [issue resolution](https://github.com/flutter/flutter/issues/77929)
