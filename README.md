@@ -6,11 +6,16 @@ A customizable code text field supporting syntax highlighting
 [![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://bertrandbev.github.io/code_field/)
 [![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://raw.githubusercontent.com/BertrandBev/code_field/master/LICENSE)
 
-<img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/android.png" width="60%">
+<img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/top.gif">
 
 ## Live demo
 
 A [live demo](https://bertrandbev.github.io/code_field/#/) showcasing a few language / themes combinaisons 
+
+## Showcase
+
+The dart VM [dlox](https://github.com/BertrandBev/dlox) uses **CodeField** in its [online editor](https://bertrandbev.github.io/dlox/#/) 
+
 
 ## Features
 
@@ -23,13 +28,13 @@ A [live demo](https://bertrandbev.github.io/code_field/#/) showcasing a few lang
 
 Code modifiers help manage indents automatically
 
-<img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/typing.line">
+<img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/typing.gif">
 
 
 The editor is wrapped in a horizontal scrallable container to handle long lines
 
 
-<img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/long_line.line">
+<img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/long_line.gif">
 
 
 ## Installing
@@ -49,6 +54,7 @@ In your library add the following import:
 ```dart
 import 'package:code_text_field/code_field.dart';
 ```
+
 
 ## Simple example
 
@@ -101,6 +107,7 @@ class _CodeEditorState extends State<CodeEditor> {
 
 Here, the monospace font [Source Code Pro](https://fonts.google.com/specimen/Source+Code+Pro?preview.text_type=custom) has been added to the assets folder and to the [pubspec.yaml](https://github.com/BertrandBev/code_field/blob/master/example/pubspec.yaml) file
 
+
 ## Parser options
 
 On top of a language definition, world-wise styling can be specified in the **stringMap** field
@@ -149,6 +156,7 @@ _codeController = CodeController(
 
 <img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/example_3.png" width="60%">
 
+
 ## Code Modifiers
 
 Code modifiers can be created to react to special keystrokes.
@@ -166,6 +174,7 @@ class TabModifier extends CodeModifier {
   }
 }
 ```
+
 
 ## API
 
