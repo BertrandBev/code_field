@@ -20,6 +20,42 @@ class _CodeEditorState extends State<CodeEditor> {
   @override
   void initState() {
     super.initState();
+    final source = "";
+    // Instantiate the CodeController
+    _codeController = CodeController(
+      text: source,
+      language: dart,
+      theme: monokaiSublimeTheme,
+    );
+  }
+
+  @override
+  void dispose() {
+    _codeController?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CodeField(
+      controller: _codeController!,
+      textStyle: TextStyle(fontFamily: 'SourceCode'),
+      expands: true,
+    );
+  }
+}
+
+class CodeEditor1 extends StatefulWidget {
+  @override
+  _CodeEditor1State createState() => _CodeEditor1State();
+}
+
+class _CodeEditor1State extends State<CodeEditor> {
+  CodeController? _codeController;
+
+  @override
+  void initState() {
+    super.initState();
     final source = "void main() {\n    print(\"Hello, world!\");\n}";
     // Instantiate the CodeController
     _codeController = CodeController(

@@ -1,16 +1,26 @@
 import 'dart:math';
-
+import 'package:code_text_field/src/code_modifier.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:highlight/highlight_core.dart';
+
+class EditorParams {
+  final int tabSpaces;
+
+  const EditorParams({this.tabSpaces = 2});
+}
 
 class CodeController extends TextEditingController {
   final Mode? language;
   final Map<String, TextStyle>? theme;
   final Map<String, TextStyle>? patternMap;
   final Map<String, TextStyle>? stringMap;
-  final String languageId = genId();
+  final EditorParams params;
+  final List<CodeModifier> modifiers;
+  final String languageId = _genId();
   // Computed members
   final styleList = <TextStyle>[];
+  final modifierMap = <String, CodeModifier>{};
   RegExp? styleRegExp;
 
   /// Creates a CodeController instance
@@ -20,23 +30,75 @@ class CodeController extends TextEditingController {
     this.theme,
     this.patternMap,
     this.stringMap,
+    this.params = const EditorParams(),
+    this.modifiers = const <CodeModifier>[
+      const IntendModifier(),
+      const CloseBlockModifier(),
+      const TabModifier(),
+    ],
   }) : super(text: text) {
     // PatternMap
     if (language != null && theme == null)
       throw Exception("A theme must be provided for language parsing");
+    // Register language
     if (language != null) {
-      // Register language
       highlight.registerLanguage(languageId, language!);
     }
+    // Create modifier map
+    modifiers.forEach((el) {
+      modifierMap[el.char] = el;
+    });
   }
 
-  static String genId() {
+  void insertStr(String str) {
+    final sel = selection;
+    text = text.replaceRange(selection.start, selection.end, str);
+    final len = str.length;
+    selection = sel.copyWith(
+      baseOffset: sel.start + len,
+      extentOffset: sel.start + len,
+    );
+  }
+
+  bool onKey(RawKeyEvent event) {
+    if (event.isKeyPressed(LogicalKeyboardKey.tab)) {
+      text = text.replaceRange(selection.start, selection.end, "\t");
+      return true;
+    }
+    return false;
+  }
+
+  static String _genId() {
     const _chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
     final _rnd = Random();
     return String.fromCharCodes(
       Iterable.generate(
           10, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))),
     );
+  }
+
+  int? _insertedLoc(String a, String b) {
+    final sel = selection;
+    if (a.length + 1 != b.length || sel.start != sel.end) return null;
+    return sel.start;
+  }
+
+  @override
+  set value(TextEditingValue newValue) {
+    final loc = _insertedLoc(text, newValue.text);
+    if (loc != null) {
+      final char = newValue.text[loc];
+      final modifier = modifierMap[char];
+      final val = modifier?.updateString(text, selection, params);
+      if (val != null) {
+        // Update newValue
+        newValue = newValue.copyWith(
+          text: val.text,
+          selection: val.selection,
+        );
+      }
+    }
+    super.value = newValue;
   }
 
   TextSpan _processPatterns(String text, TextStyle? style) {
@@ -105,13 +167,6 @@ class CodeController extends TextEditingController {
 
   @override
   TextSpan buildTextSpan({TextStyle? style, bool? withComposing}) {
-    // final pattern = r"((a)b)|((c)(d))";
-    // final re = RegExp(pattern);
-    // final m = re.firstMatch("cd");
-    // final groups = <String>[];
-    // for (int k = 0; k < m.groupCount; k++) groups.add(m.group(k));
-    // print("count: ${m.groupCount}, groups: ${groups}");
-
     // Retrieve pattern regexp
     final patternList = <String>[];
     if (stringMap != null) {
@@ -122,7 +177,6 @@ class CodeController extends TextEditingController {
       patternList.addAll(patternMap!.keys.map((e) => "(" + e + ")"));
       styleList.addAll(patternMap!.values);
     }
-    print(patternList.join('|'));
     styleRegExp = RegExp(patternList.join('|'), multiLine: true);
 
     // Return parsing

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'readme/readme_examples.dart';
 
 void main() {
   runApp(MyApp());
@@ -80,9 +79,14 @@ class _HomePageState extends State<HomePage> {
         constraints: BoxConstraints(maxWidth: 900),
         padding: EdgeInsets.symmetric(vertical: 32.0),
         child: Column(children: children),
-        // child: CodeEditor4(),
       ),
     );
+
+    // return Scaffold(
+    //   appBar: AppBar(),
+    //   body: CodeEditor(),
+    // );
+
     return Scaffold(
       backgroundColor: Color(0xFF363636),
       appBar: AppBar(

@@ -1,6 +1,10 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import './code_controller.dart';
@@ -13,14 +17,16 @@ class LineNumberController extends TextEditingController {
   @override
   TextSpan buildTextSpan({TextStyle? style, bool? withComposing}) {
     final children = <TextSpan>[];
-    text.split("\n").forEach((el) {
+    final list = text.split("\n");
+    for (int k = 0; k < list.length; k++) {
+      final el = list[k];
       final number = int.parse(el);
       var textSpan = TextSpan(text: el, style: style);
       if (lineNumberBuilder != null)
         textSpan = lineNumberBuilder!(number, style);
       children.add(textSpan);
-      children.add(TextSpan(text: "\n"));
-    });
+      if (k < list.length - 1) children.add(TextSpan(text: "\n"));
+    }
     return TextSpan(children: children, style: style);
   }
 }
@@ -53,7 +59,6 @@ class CodeField extends StatefulWidget {
   final Color? cursorColor;
   final TextSelectionThemeData? textSelectionTheme;
   final TextSpan Function(int, TextStyle?)? lineNumberBuilder;
-  final int tabSpaces;
 
   const CodeField({
     Key? key,
@@ -69,7 +74,6 @@ class CodeField extends StatefulWidget {
     this.cursorColor,
     this.textSelectionTheme,
     this.lineNumberBuilder,
-    this.tabSpaces = 2,
   }) : super(key: key);
 
   @override
@@ -83,6 +87,9 @@ class CodeFieldState extends State<CodeField> {
   ScrollController? _codeScroll;
   LineNumberController? _numberController;
   //
+  final _keyboardVisibility = KeyboardVisibilityController();
+  StreamSubscription<bool>? _keyboardVisibilitySubscription;
+  FocusNode? _focusNode;
   String? lines;
   String longestLine = "";
 
@@ -94,7 +101,14 @@ class CodeFieldState extends State<CodeField> {
     _codeScroll = _controllers?.addAndGet();
     _numberController = LineNumberController(widget.lineNumberBuilder);
     widget.controller.addListener(_onTextChanged);
+    _keyboardVisibilitySubscription =
+        _keyboardVisibility.onChange.listen(_onKeyboardChanged);
+    _focusNode = FocusNode(onKey: _onKey);
     _onTextChanged();
+  }
+
+  bool _onKey(FocusNode node, RawKeyEvent event) {
+    return widget.controller.onKey(event);
   }
 
   @override
@@ -103,7 +117,12 @@ class CodeFieldState extends State<CodeField> {
     _numberScroll?.dispose();
     _codeScroll?.dispose();
     _numberController?.dispose();
+    _keyboardVisibilitySubscription?.cancel();
     super.dispose();
+  }
+
+  void _onKeyboardChanged(bool visible) {
+    if (!visible) FocusScope.of(context).requestFocus(FocusNode());
   }
 
   void rebuild() {
@@ -126,16 +145,38 @@ class CodeFieldState extends State<CodeField> {
     setState(() {});
   }
 
-  void _insertStr(String str) {
-    String text = widget.controller.text;
-    TextSelection textSelection = widget.controller.selection;
-    String newText =
-        text.replaceRange(textSelection.start, textSelection.end, str);
-    final len = str.length;
-    widget.controller.text = newText;
-    widget.controller.selection = textSelection.copyWith(
-      baseOffset: textSelection.start + len,
-      extentOffset: textSelection.start + len,
+  // Wrap the codeField in a horizontal scrollView
+  Widget _wrapInScrollView(
+      Widget codeField, TextStyle textStyle, double minWidth) {
+    final leftPad = widget.lineNumberStyle.margin / 2;
+    final intrinsic = IntrinsicWidth(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ConstrainedBox(
+            // Force the neightoring textBox
+            constraints: BoxConstraints(
+              maxHeight: 0.0,
+              minWidth: max(minWidth - leftPad, 0.0),
+            ),
+            child: Padding(
+              child: Text(longestLine, style: textStyle),
+              padding: const EdgeInsets.only(right: 16.0),
+            ), // Add some buffer),
+          ),
+          widget.expands ? Expanded(child: codeField) : codeField,
+        ],
+      ),
+    );
+
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(
+        left: leftPad,
+        right: widget.padding.right,
+      ),
+      scrollDirection: Axis.horizontal,
+      child: intrinsic,
     );
   }
 
@@ -196,6 +237,7 @@ class CodeFieldState extends State<CodeField> {
     );
 
     final codeField = TextField(
+      focusNode: _focusNode,
       scrollPadding: widget.padding,
       style: textStyle,
       controller: widget.controller,
@@ -213,44 +255,14 @@ class CodeFieldState extends State<CodeField> {
       enableSuggestions: false,
     );
 
-    final codeFocus = Focus(
-      child: codeField,
-      onKey: (data, event) {
-        if (event.isKeyPressed(LogicalKeyboardKey.tab)) {
-          _insertStr(" " * widget.tabSpaces);
-          return true;
-        }
-        return false;
-      },
-    );
-
-    final intrinsic = IntrinsicWidth(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0), // Add some buffer
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: 0.0),
-              child: Text(longestLine, style: textStyle),
-            ),
-          ),
-          widget.expands ? Expanded(child: codeFocus) : codeFocus,
-        ],
-      ),
-    );
     final codeCol = Theme(
       data: Theme.of(context).copyWith(
         textSelectionTheme: widget.textSelectionTheme,
       ),
-      child: SingleChildScrollView(
-        padding: EdgeInsets.only(
-          left: widget.lineNumberStyle.margin / 2,
-          right: widget.padding.right,
-        ),
-        scrollDirection: Axis.horizontal,
-        child: intrinsic,
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          return _wrapInScrollView(codeField, textStyle, constraints.maxWidth);
+        },
       ),
     );
     return Container(

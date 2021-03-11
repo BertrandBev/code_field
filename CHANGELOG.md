@@ -1,3 +1,9 @@
 ## [1.0.0-1] - 2021-03-06
 
 * Initial release
+
+## [1.0.0-4] - 2021-03-11
+
+* Added horizontal scrolling support
+* Added code modifiers
+* Cleaner padding API

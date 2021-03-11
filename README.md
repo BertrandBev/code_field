@@ -18,7 +18,19 @@ A [live demo](https://bertrandbev.github.io/code_field/#/) showcasing a few lang
 - Easy language highlight customization through the use of theme maps
 - Fully customizable code field style through a TextField like API
 - Handles horizontal/vertical scrolling and vertical expansion
+- Supports code modifiers
 - Works on Android, iOS, and Web
+
+Code modifiers help manage indents automatically
+
+<img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/typing.line">
+
+
+The editor is wrapped in a horizontal scrallable container to handle long lines
+
+
+<img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/long_line.line">
+
 
 ## Installing
 
@@ -137,13 +149,31 @@ _codeController = CodeController(
 
 <img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/example_3.png" width="60%">
 
+## Code Modifiers
+
+Code modifiers can be created to react to special keystrokes.
+The default modifiers handle tab to space & automatic indentation. Here's the implementation of the default **TabModifier**
+
+```dart
+class TabModifier extends CodeModifier {
+  const TabModifier() : super('\t');
+
+  @override
+  TextEditingValue? updateString(
+      String text, TextSelection sel, EditorParams params) {
+    final tmp = replace(text, sel.start, sel.end, " " * params.tabSpaces);
+    return tmp;
+  }
+}
+```
+
 ## API
 
 ### CodeField
 
 ```dart
 CodeField({
-  Key? key,
+Key? key,
   required this.controller,
   this.minLines,
   this.maxLines,
@@ -151,11 +181,11 @@ CodeField({
   this.background,
   this.decoration,
   this.textStyle,
-  this.padding = const EdgeInsets.symmetric(horizontal: 8.0),
-  this.scrollPadding = const EdgeInsets.symmetric(vertical: 8.0),
+  this.padding = const EdgeInsets.symmetric(),
   this.lineNumberStyle = const LineNumberStyle(),
   this.cursorColor,
   this.textSelectionTheme,
+  this.lineNumberBuilder,
 })
 ```
 
@@ -163,7 +193,7 @@ CodeField({
 LineNumberStyle({
   this.width = 42.0,
   this.textAlign = TextAlign.right,
-  this.padding = const EdgeInsets.only(right: 10.0),
+  this.margin = 10.0,
   this.textStyle,
   this.background,
 })
@@ -178,10 +208,16 @@ CodeController({
   this.theme,
   this.patternMap,
   this.stringMap,
+  this.params = const EditorParams(),
+  this.modifiers = const <CodeModifier>[
+    const IntendModifier(),
+    const CloseBlockModifier(),
+    const TabModifier(),
+  ],
 })
 ```
 
 ## Limitations
 
 - Autocomplete disabling on android [doesn't work yet](https://github.com/flutter/flutter/issues/71679)
-- The TextField cursor doesn't seem to be handling space keys properly on the web platform. Pending issue resolution
+- The TextField cursor doesn't seem to be handling space inputs properly on the web platform. Pending issue resolution
