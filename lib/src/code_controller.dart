@@ -91,6 +91,16 @@ class CodeController extends TextEditingController {
     return false;
   }
 
+  /// Method to get untransformed text
+  ///
+  /// See webSpaceFix
+  String get rawText {
+    if (!_webSpaceFix) return super.text;
+    return super.text.replaceAll(_MIDDLE_DOT, " ");
+  }
+
+  // Private methods
+
   bool get _webSpaceFix => kIsWeb && webSpaceFix;
 
   static String _genId() {
@@ -114,7 +124,7 @@ class CodeController extends TextEditingController {
     if (loc != null) {
       final char = newValue.text[loc];
       final modifier = modifierMap[char];
-      final val = modifier?.updateString(text, selection, params);
+      final val = modifier?.updateString(rawText, selection, params);
       if (val != null) {
         // Update newValue
         newValue = newValue.copyWith(
@@ -201,7 +211,7 @@ class CodeController extends TextEditingController {
     // Retrieve pattern regexp
     final patternList = <String>[];
     if (_webSpaceFix) {
-      patternList.add(_MIDDLE_DOT);
+      patternList.add("(" + _MIDDLE_DOT + ")");
       styleList.add(TextStyle(color: Colors.transparent));
     }
     if (stringMap != null) {

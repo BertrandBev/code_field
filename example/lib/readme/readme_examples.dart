@@ -50,7 +50,7 @@ class CodeEditor1 extends StatefulWidget {
   _CodeEditor1State createState() => _CodeEditor1State();
 }
 
-class _CodeEditor1State extends State<CodeEditor> {
+class _CodeEditor1State extends State<CodeEditor1> {
   CodeController? _codeController;
 
   @override

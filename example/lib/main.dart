@@ -1,5 +1,5 @@
 import 'package:example/custom_code_box.dart';
-import 'package:example/readme/readme_examples.dart';
+// import 'package:example/readme/readme_examples.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 // ignore: import_of_legacy_library_into_null_safe
