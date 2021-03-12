@@ -3,6 +3,9 @@ import 'package:code_text_field/src/code_modifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:highlight/highlight_core.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+
+const _MIDDLE_DOT = '·';
 
 class EditorParams {
   final int tabSpaces;
@@ -11,19 +14,37 @@ class EditorParams {
 }
 
 class CodeController extends TextEditingController {
+  /// A highligh language to parse the text with
   final Mode? language;
+
+  /// The theme to apply to the [language] parsing result
   final Map<String, TextStyle>? theme;
+
+  /// A map of specific regexes to style
   final Map<String, TextStyle>? patternMap;
+
+  /// A map of specific keywords to style
   final Map<String, TextStyle>? stringMap;
+
+  /// Common editor params such as the size of a tab in spaces
+  ///
+  /// Will be exposed to all [modifiers]
   final EditorParams params;
+
+  /// A list of code modifiers to dynamically update the code upon certain keystrokes
   final List<CodeModifier> modifiers;
+
+  /// On web, replace spaces with invisible dots “·” to fix the current issue with spaces
+  ///
+  /// https://github.com/flutter/flutter/issues/77929
+  final bool webSpaceFix;
+
+  /* Computed members */
   final String languageId = _genId();
-  // Computed members
   final styleList = <TextStyle>[];
   final modifierMap = <String, CodeModifier>{};
   RegExp? styleRegExp;
 
-  /// Creates a CodeController instance
   CodeController({
     String? text,
     this.language,
@@ -36,6 +57,7 @@ class CodeController extends TextEditingController {
       const CloseBlockModifier(),
       const TabModifier(),
     ],
+    this.webSpaceFix = true,
   }) : super(text: text) {
     // PatternMap
     if (language != null && theme == null)
@@ -50,6 +72,7 @@ class CodeController extends TextEditingController {
     });
   }
 
+  /// Replaces the current [selection] by [str]
   void insertStr(String str) {
     final sel = selection;
     text = text.replaceRange(selection.start, selection.end, str);
@@ -67,6 +90,8 @@ class CodeController extends TextEditingController {
     }
     return false;
   }
+
+  bool get _webSpaceFix => kIsWeb && webSpaceFix;
 
   static String _genId() {
     const _chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
@@ -97,6 +122,12 @@ class CodeController extends TextEditingController {
           selection: val.selection,
         );
       }
+    }
+    // Now fix the textfield for web
+    if (_webSpaceFix) {
+      newValue = newValue.copyWith(
+        text: newValue.text.replaceAll(' ', _MIDDLE_DOT),
+      );
     }
     super.value = newValue;
   }
@@ -169,6 +200,10 @@ class CodeController extends TextEditingController {
   TextSpan buildTextSpan({TextStyle? style, bool? withComposing}) {
     // Retrieve pattern regexp
     final patternList = <String>[];
+    if (_webSpaceFix) {
+      patternList.add(_MIDDLE_DOT);
+      styleList.add(TextStyle(color: Colors.transparent));
+    }
     if (stringMap != null) {
       patternList.addAll(stringMap!.keys.map((e) => r'(\b' + e + r'\b)'));
       styleList.addAll(stringMap!.values);

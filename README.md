@@ -229,4 +229,4 @@ CodeController({
 ## Limitations
 
 - Autocomplete disabling on android [doesn't work yet](https://github.com/flutter/flutter/issues/71679)
-- The TextField cursor doesn't seem to be handling space inputs properly on the web platform. Pending [issue resolution](https://github.com/flutter/flutter/issues/77929)
+- The TextField cursor doesn't seem to be handling space inputs properly on the web platform. Pending [issue resolution](https://github.com/flutter/flutter/issues/77929). The flag `webSpaceFix` fixes it by swapping spaces with transparent middle points.

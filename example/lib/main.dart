@@ -83,10 +83,10 @@ class _HomePageState extends State<HomePage> {
       ),
     );
 
-    // return Scaffold(
-    //   appBar: AppBar(),
-    //   body: CodeEditor(),
-    // );
+    return Scaffold(
+      appBar: AppBar(),
+      body: CodeEditor(),
+    );
 
     return Scaffold(
       backgroundColor: Color(0xFF363636),

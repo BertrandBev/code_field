@@ -32,11 +32,21 @@ class LineNumberController extends TextEditingController {
 }
 
 class LineNumberStyle {
+  /// Width of the line number column
   final double width;
+
+  /// Alignment of the numbers in the column
   final TextAlign textAlign;
+
+  /// Style of the numbers
   final TextStyle? textStyle;
+
+  /// Background of the line number column
   final Color? background;
+
+  /// Central horizontal margin between the numbers and the code
   final double margin;
+
   const LineNumberStyle({
     this.width = 42.0,
     this.textAlign = TextAlign.right,
@@ -47,18 +57,34 @@ class LineNumberStyle {
 }
 
 class CodeField extends StatefulWidget {
+  /// {@macro flutter.widgets.textField.minLines}
   final int? minLines;
+
+  /// {@macro flutter.widgets.textField.maxLInes}
   final int? maxLines;
+
+  /// {@macro flutter.widgets.textField.expands}
   final bool expands;
+
+  /// A CodeController instance to apply language highlight, themeing and modifiers
   final CodeController controller;
+  
+  /// A LineNumberStyle instance to tweak the line number column styling
   final LineNumberStyle lineNumberStyle;
+
+  /// {@macro flutter.widgets.textField.cursorColor}
+  final Color? cursorColor;
+
+  /// {@macro flutter.widgets.textField.textStyle}
+  final TextStyle? textStyle;
+
+  /// A way to replace specific line numbers by a custom TextSpan
+  final TextSpan Function(int, TextStyle?)? lineNumberBuilder;
+
   final Color? background;
   final EdgeInsets padding;
   final Decoration? decoration;
-  final TextStyle? textStyle;
-  final Color? cursorColor;
   final TextSelectionThemeData? textSelectionTheme;
-  final TextSpan Function(int, TextStyle?)? lineNumberBuilder;
 
   const CodeField({
     Key? key,

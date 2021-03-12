@@ -7,3 +7,7 @@
 * Added horizontal scrolling support
 * Added code modifiers
 * Cleaner padding API
+
+## [1.0.0-6] - 2021-03-12
+
+* Added a temporary fix for https://github.com/flutter/flutter/issues/77929
