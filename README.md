@@ -31,7 +31,7 @@ Code modifiers help manage indents automatically
 <img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/typing.gif" width="70%">
 
 
-The editor is wrapped in a horizontal scrallable container to handle long lines
+The editor is wrapped in a horizontal scrollable container to handle long lines
 
 
 <img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/long_line.gif" width="70%">
