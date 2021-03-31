@@ -5,6 +5,7 @@ A customizable code text field supporting syntax highlighting
 [![Pub](https://img.shields.io/pub/v/code_text_field.svg)](https://pub.dev/packages/code_text_field)
 [![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://bertrandbev.github.io/code_field/)
 [![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://raw.githubusercontent.com/BertrandBev/code_field/master/LICENSE)
+[![Awesome Flutter](https://img.shields.io/badge/Awesome-Flutter-blue.svg?longCache=true&style=flat-square)](https://github.com/Solido/awesome-flutter)
 
 <img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/top.gif" width="70%">
 
@@ -14,7 +15,7 @@ A [live demo](https://bertrandbev.github.io/code_field/#/) showcasing a few lang
 
 ## Showcase
 
-The dart VM [dlox](https://github.com/BertrandBev/dlox) uses **CodeField** in its [online editor](https://bertrandbev.github.io/dlox/#/) 
+The experimental VM [dlox](https://github.com/BertrandBev/dlox) uses **CodeField** in its [online editor](https://bertrandbev.github.io/dlox/#/) 
 
 
 ## Features
