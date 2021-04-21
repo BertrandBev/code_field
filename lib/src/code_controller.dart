@@ -207,8 +207,7 @@ class CodeController extends TextEditingController {
   }
 
   @override
-  TextSpan buildTextSpan(
-      {required BuildContext context, TextStyle? style, bool? withComposing}) {
+  TextSpan buildTextSpan({TextStyle? style, bool? withComposing}) {
     // Retrieve pattern regexp
     final patternList = <String>[];
     if (_webSpaceFix) {

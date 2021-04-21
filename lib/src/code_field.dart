@@ -14,8 +14,7 @@ class LineNumberController extends TextEditingController {
   LineNumberController(this.lineNumberBuilder);
 
   @override
-  TextSpan buildTextSpan(
-      {required BuildContext context, TextStyle? style, bool? withComposing}) {
+  TextSpan buildTextSpan({TextStyle? style, bool? withComposing}) {
     final children = <TextSpan>[];
     final list = text.split("\n");
     for (int k = 0; k < list.length; k++) {
