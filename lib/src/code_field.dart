@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import './code_controller.dart';
 
@@ -112,7 +111,6 @@ class CodeFieldState extends State<CodeField> {
   ScrollController? _codeScroll;
   LineNumberController? _numberController;
   //
-  final _keyboardVisibility = KeyboardVisibilityController();
   StreamSubscription<bool>? _keyboardVisibilitySubscription;
   FocusNode? _focusNode;
   String? lines;
@@ -126,8 +124,6 @@ class CodeFieldState extends State<CodeField> {
     _codeScroll = _controllers?.addAndGet();
     _numberController = LineNumberController(widget.lineNumberBuilder);
     widget.controller.addListener(_onTextChanged);
-    _keyboardVisibilitySubscription =
-        _keyboardVisibility.onChange.listen(_onKeyboardChanged);
     _focusNode = FocusNode(onKey: _onKey);
     _onTextChanged();
   }
@@ -144,10 +140,6 @@ class CodeFieldState extends State<CodeField> {
     _numberController?.dispose();
     _keyboardVisibilitySubscription?.cancel();
     super.dispose();
-  }
-
-  void _onKeyboardChanged(bool visible) {
-    if (!visible) FocusScope.of(context).requestFocus(FocusNode());
   }
 
   void rebuild() {
