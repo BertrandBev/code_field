@@ -83,12 +83,12 @@ class CodeController extends TextEditingController {
     );
   }
 
-  bool onKey(RawKeyEvent event) {
+  KeyEventResult onKey(RawKeyEvent event) {
     if (event.isKeyPressed(LogicalKeyboardKey.tab)) {
       text = text.replaceRange(selection.start, selection.end, "\t");
-      return true;
+      return KeyEventResult.handled;
     }
-    return false;
+    return KeyEventResult.ignored;
   }
 
   /// Method to get untransformed text
