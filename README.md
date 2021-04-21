@@ -231,3 +231,7 @@ CodeController({
 
 - Autocomplete disabling on android [doesn't work yet](https://github.com/flutter/flutter/issues/71679)
 - The TextField cursor doesn't seem to be handling space inputs properly on the web platform. Pending [issue resolution](https://github.com/flutter/flutter/issues/77929). The flag `webSpaceFix` fixes it by swapping spaces with transparent middle points.
+
+## Notes
+
+A [breaking change](https://flutter.dev/docs/release/breaking-changes/buildtextspan-buildcontext) to the `TextEditingController` was introduced in flutter beta, dev & master channels. The branch [beta](https://github.com/BertrandBev/code_field/tree/beta) should comply with those changes.
