@@ -1,6 +1,6 @@
 name: code_text_field
 description: A customizable code field supporting syntax highlighting, bi-directionnal scrolling and code modifiers
-version: 1.0.0-9
+version: 1.0.1-0
 homepage: https://github.com/BertrandBev/code_field
 
 environment:

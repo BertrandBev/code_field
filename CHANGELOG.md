@@ -19,3 +19,7 @@
 ## [1.0.0-9] - 2021-04-21
 
 * Removed dependency on flutter_keyboard_visibility
+
+## [1.0.1-0] - 2021-05-22
+
+* TextEditingController.buildTextSpan breaking change migration for flutter 2.2.0
