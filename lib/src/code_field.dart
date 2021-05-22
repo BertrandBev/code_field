@@ -128,7 +128,7 @@ class CodeFieldState extends State<CodeField> {
     _onTextChanged();
   }
 
-  bool _onKey(FocusNode node, RawKeyEvent event) {
+  KeyEventResult _onKey(FocusNode node, RawKeyEvent event) {
     return widget.controller.onKey(event);
   }
 
