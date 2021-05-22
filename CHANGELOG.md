@@ -15,3 +15,7 @@
 ## [1.0.0-7] - 2021-03-12
 
 * Added a rawText getter to CodeController
+
+## [1.0.0-9] - 2021-04-21
+
+* Removed dependency on flutter_keyboard_visibility
