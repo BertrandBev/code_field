@@ -65,6 +65,9 @@ class CodeField extends StatefulWidget {
   /// {@macro flutter.widgets.textField.expands}
   final bool expands;
 
+  /// Whether overflowing lines should wrap around or make the field scrollable horizontally
+  final bool wrap;
+
   /// A CodeController instance to apply language highlight, themeing and modifiers
   final CodeController controller;
 
@@ -91,6 +94,7 @@ class CodeField extends StatefulWidget {
     this.minLines,
     this.maxLines,
     this.expands = false,
+    this.wrap = false,
     this.background,
     this.decoration,
     this.textStyle,
@@ -173,7 +177,6 @@ class CodeFieldState extends State<CodeField> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ConstrainedBox(
-            // Force the neightoring textBox
             constraints: BoxConstraints(
               maxHeight: 0.0,
               minWidth: max(minWidth - leftPad, 0.0),
@@ -181,7 +184,7 @@ class CodeFieldState extends State<CodeField> {
             child: Padding(
               child: Text(longestLine, style: textStyle),
               padding: const EdgeInsets.only(right: 16.0),
-            ), // Add some buffer),
+            ), // Add extra padding
           ),
           widget.expands ? Expanded(child: codeField) : codeField,
         ],
@@ -249,7 +252,6 @@ class CodeFieldState extends State<CodeField> {
         left: widget.padding.left,
         right: widget.lineNumberStyle.margin / 2,
       ),
-      // padding: widget.lineNumberStyle.padding,
       color: widget.lineNumberStyle.background,
       child: lineNumberCol,
     );
@@ -279,7 +281,10 @@ class CodeFieldState extends State<CodeField> {
       ),
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          return _wrapInScrollView(codeField, textStyle, constraints.maxWidth);
+          // Control horizontal scrolling
+          return widget.wrap
+              ? codeField
+              : _wrapInScrollView(codeField, textStyle, constraints.maxWidth);
         },
       ),
     );

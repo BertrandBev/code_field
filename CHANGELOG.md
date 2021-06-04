@@ -23,3 +23,7 @@
 ## [1.0.1-0] - 2021-05-22
 
 * TextEditingController.buildTextSpan breaking change migration for flutter 2.2.0
+
+## [1.0.1-1] - 2021-06-04
+
+* Added wrap paramerter to disable horizontal scrolling
