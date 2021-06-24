@@ -87,6 +87,7 @@ class CodeField extends StatefulWidget {
   final EdgeInsets padding;
   final Decoration? decoration;
   final TextSelectionThemeData? textSelectionTheme;
+  final FocusNode? focusNode;
 
   const CodeField({
     Key? key,
@@ -103,6 +104,7 @@ class CodeField extends StatefulWidget {
     this.cursorColor,
     this.textSelectionTheme,
     this.lineNumberBuilder,
+    this.focusNode,
   }) : super(key: key);
 
   @override
@@ -129,7 +131,9 @@ class CodeFieldState extends State<CodeField> {
     _codeScroll = _controllers?.addAndGet();
     _numberController = LineNumberController(widget.lineNumberBuilder);
     widget.controller.addListener(_onTextChanged);
-    _focusNode = FocusNode(onKey: _onKey);
+    _focusNode = widget.focusNode ?? FocusNode();
+    _focusNode!.attach(context,onKey: _onKey);
+
     _onTextChanged();
   }
 
