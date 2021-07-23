@@ -91,12 +91,21 @@ class CodeController extends TextEditingController {
     return KeyEventResult.ignored;
   }
 
-  /// Method to get untransformed text
-  ///
+  /// See webSpaceFix
+  static String _spacesToMiddleDots(String str) {
+    return str.replaceAll(" ", _MIDDLE_DOT);
+  }
+
+  /// See webSpaceFix
+  static String _middleDotsToSpaces(String str) {
+    return str.replaceAll(_MIDDLE_DOT, " ");
+  }
+
+  /// Get untransformed text
   /// See webSpaceFix
   String get rawText {
     if (!_webSpaceFix) return super.text;
-    return super.text.replaceAll(_MIDDLE_DOT, " ");
+    return _middleDotsToSpaces(super.text);
   }
 
   // Private methods
@@ -169,7 +178,8 @@ class CodeController extends TextEditingController {
   }
 
   TextSpan _processLanguage(String text, TextStyle? style) {
-    final result = highlight.parse(text, language: languageId);
+    final rawText = _middleDotsToSpaces(text);
+    final result = highlight.parse(rawText, language: languageId);
 
     final nodes = result.nodes;
 
@@ -178,9 +188,10 @@ class CodeController extends TextEditingController {
     final stack = <List<TextSpan>>[];
 
     void _traverse(Node node) {
-      final val = node.value;
+      var val = node.value;
       final nodeChildren = node.children;
       if (val != null) {
+        val = _spacesToMiddleDots(val);
         var child = TextSpan(text: val, style: theme?[node.className]);
         if (styleRegExp != null)
           child = _processPatterns(val, theme?[node.className]);
