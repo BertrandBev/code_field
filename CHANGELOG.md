@@ -27,3 +27,7 @@
 ## [1.0.1-1] - 2021-06-04
 
 * Added wrap paramerter to disable horizontal scrolling
+  
+## [1.0.1-2] - 2021-07-23
+
+* Fixed highlight parsing on web (issue #11)
