@@ -197,6 +197,7 @@ Key? key,
   this.cursorColor,
   this.textSelectionTheme,
   this.lineNumberBuilder,
+  this.focusNode
 })
 ```
 
