@@ -83,6 +83,9 @@ class CodeField extends StatefulWidget {
   /// A way to replace specific line numbers by a custom TextSpan
   final TextSpan Function(int, TextStyle?)? lineNumberBuilder;
 
+  /// {@macro flutter.widgets.textField.enabled}
+  final bool? enabled;
+
   final Color? background;
   final EdgeInsets padding;
   final Decoration? decoration;
@@ -101,6 +104,7 @@ class CodeField extends StatefulWidget {
     this.textStyle,
     this.padding = const EdgeInsets.symmetric(),
     this.lineNumberStyle = const LineNumberStyle(),
+    this.enabled,
     this.cursorColor,
     this.textSelectionTheme,
     this.lineNumberBuilder,
@@ -132,7 +136,7 @@ class CodeFieldState extends State<CodeField> {
     _numberController = LineNumberController(widget.lineNumberBuilder);
     widget.controller.addListener(_onTextChanged);
     _focusNode = widget.focusNode ?? FocusNode();
-    _focusNode!.attach(context,onKey: _onKey);
+    _focusNode!.attach(context, onKey: _onKey);
 
     _onTextChanged();
   }
@@ -277,6 +281,7 @@ class CodeFieldState extends State<CodeField> {
       cursorColor: cursorColor,
       autocorrect: false,
       enableSuggestions: false,
+      enabled: widget.enabled,
     );
 
     final codeCol = Theme(

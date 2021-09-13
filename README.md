@@ -194,10 +194,11 @@ Key? key,
   this.textStyle,
   this.padding = const EdgeInsets.symmetric(),
   this.lineNumberStyle = const LineNumberStyle(),
+  this.enabled,
   this.cursorColor,
   this.textSelectionTheme,
   this.lineNumberBuilder,
-  this.focusNode
+  this.focusNode,
 })
 ```
 
