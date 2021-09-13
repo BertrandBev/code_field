@@ -87,6 +87,35 @@ class CodeController extends TextEditingController {
     );
   }
 
+  /// Remove the char just before the cursor or the selection
+  void removeChar() {
+    if (selection.start < 1) return;
+    final sel = selection;
+    text = text.replaceRange(selection.start - 1, selection.start, "");
+    selection = sel.copyWith(
+      baseOffset: sel.start - 1,
+      extentOffset: sel.start - 1,
+    );
+  }
+
+  /// Remove the selected text
+  void removeSelection() {
+    final sel = selection;
+    text = text.replaceRange(selection.start, selection.end, "");
+    selection = sel.copyWith(
+      baseOffset: sel.start,
+      extentOffset: sel.start,
+    );
+  }
+
+  /// Remove the selection or last char if the selection is empty
+  void backspace() {
+    if (selection.start < selection.end)
+      removeSelection();
+    else
+      removeChar();
+  }
+
   KeyEventResult onKey(RawKeyEvent event) {
     if (event.isKeyPressed(LogicalKeyboardKey.tab)) {
       text = text.replaceRange(selection.start, selection.end, "\t");
