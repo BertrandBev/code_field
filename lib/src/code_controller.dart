@@ -109,7 +109,6 @@ class CodeController extends TextEditingController {
   }
 
   // Private methods
-
   bool get _webSpaceFix => kIsWeb && webSpaceFix;
 
   static String _genId() {
@@ -143,11 +142,8 @@ class CodeController extends TextEditingController {
       }
     }
     // Now fix the textfield for web
-    if (_webSpaceFix) {
-      newValue = newValue.copyWith(
-        text: newValue.text.replaceAll(' ', _MIDDLE_DOT),
-      );
-    }
+    if (_webSpaceFix)
+      newValue = newValue.copyWith(text: _spacesToMiddleDots(newValue.text));
     super.value = newValue;
   }
 
@@ -178,7 +174,7 @@ class CodeController extends TextEditingController {
   }
 
   TextSpan _processLanguage(String text, TextStyle? style) {
-    final rawText = _middleDotsToSpaces(text);
+    final rawText = _webSpaceFix ? _middleDotsToSpaces(text) : text;
     final result = highlight.parse(rawText, language: languageId);
 
     final nodes = result.nodes;
@@ -191,7 +187,7 @@ class CodeController extends TextEditingController {
       var val = node.value;
       final nodeChildren = node.children;
       if (val != null) {
-        val = _spacesToMiddleDots(val);
+        if (_webSpaceFix) val = _spacesToMiddleDots(val);
         var child = TextSpan(text: val, style: theme?[node.className]);
         if (styleRegExp != null)
           child = _processPatterns(val, theme?[node.className]);
