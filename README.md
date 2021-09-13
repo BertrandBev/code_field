@@ -227,6 +227,7 @@ CodeController({
     const CloseBlockModifier(),
     const TabModifier(),
   ],
+  this.onChange,
 })
 ```
 

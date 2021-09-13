@@ -39,6 +39,9 @@ class CodeController extends TextEditingController {
   /// https://github.com/flutter/flutter/issues/77929
   final bool webSpaceFix;
 
+  /// onChange callback, called whenever the content is changed
+  final void Function(String)? onChange;
+
   /* Computed members */
   final String languageId = _genId();
   final styleList = <TextStyle>[];
@@ -58,6 +61,7 @@ class CodeController extends TextEditingController {
       const TabModifier(),
     ],
     this.webSpaceFix = true,
+    this.onChange,
   }) : super(text: text) {
     // PatternMap
     if (language != null && theme == null)
@@ -144,6 +148,9 @@ class CodeController extends TextEditingController {
     // Now fix the textfield for web
     if (_webSpaceFix)
       newValue = newValue.copyWith(text: _spacesToMiddleDots(newValue.text));
+    if (onChange != null)
+      onChange!(
+          _webSpaceFix ? _middleDotsToSpaces(newValue.text) : newValue.text);
     super.value = newValue;
   }
 
