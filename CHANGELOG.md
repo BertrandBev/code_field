@@ -31,3 +31,10 @@
 ## [1.0.1-2] - 2021-07-23
 
 * Fixed highlight parsing on web (issue #11)
+
+## [1.0.2] - 2021-07-23
+
+* removeChar & removeSelection methods added
+* added onChange callback
+* added enabled flag
+* fixed middle dot issue
