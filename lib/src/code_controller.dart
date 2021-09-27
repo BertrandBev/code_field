@@ -56,24 +56,25 @@ class CodeController extends TextEditingController {
     this.stringMap,
     this.params = const EditorParams(),
     this.modifiers = const <CodeModifier>[
-      const IntendModifier(),
-      const CloseBlockModifier(),
-      const TabModifier(),
+      IntendModifier(),
+      CloseBlockModifier(),
+      TabModifier(),
     ],
     this.webSpaceFix = true,
     this.onChange,
   }) : super(text: text) {
     // PatternMap
-    if (language != null && theme == null)
-      throw Exception("A theme must be provided for language parsing");
+    if (language != null && theme == null) {
+      throw Exception('A theme must be provided for language parsing');
+    }
     // Register language
     if (language != null) {
       highlight.registerLanguage(languageId, language!);
     }
     // Create modifier map
-    modifiers.forEach((el) {
+    for (var el in modifiers) {
       modifierMap[el.char] = el;
-    });
+    }
   }
 
   /// Replaces the current [selection] by [str]
@@ -91,7 +92,7 @@ class CodeController extends TextEditingController {
   void removeChar() {
     if (selection.start < 1) return;
     final sel = selection;
-    text = text.replaceRange(selection.start - 1, selection.start, "");
+    text = text.replaceRange(selection.start - 1, selection.start, '');
     selection = sel.copyWith(
       baseOffset: sel.start - 1,
       extentOffset: sel.start - 1,
@@ -101,7 +102,7 @@ class CodeController extends TextEditingController {
   /// Remove the selected text
   void removeSelection() {
     final sel = selection;
-    text = text.replaceRange(selection.start, selection.end, "");
+    text = text.replaceRange(selection.start, selection.end, '');
     selection = sel.copyWith(
       baseOffset: sel.start,
       extentOffset: sel.start,
@@ -110,15 +111,16 @@ class CodeController extends TextEditingController {
 
   /// Remove the selection or last char if the selection is empty
   void backspace() {
-    if (selection.start < selection.end)
+    if (selection.start < selection.end) {
       removeSelection();
-    else
+    } else {
       removeChar();
+    }
   }
 
   KeyEventResult onKey(RawKeyEvent event) {
     if (event.isKeyPressed(LogicalKeyboardKey.tab)) {
-      text = text.replaceRange(selection.start, selection.end, "\t");
+      text = text.replaceRange(selection.start, selection.end, '\t');
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
@@ -126,12 +128,12 @@ class CodeController extends TextEditingController {
 
   /// See webSpaceFix
   static String _spacesToMiddleDots(String str) {
-    return str.replaceAll(" ", _MIDDLE_DOT);
+    return str.replaceAll(' ', _MIDDLE_DOT);
   }
 
   /// See webSpaceFix
   static String _middleDotsToSpaces(String str) {
-    return str.replaceAll(_MIDDLE_DOT, " ");
+    return str.replaceAll(_MIDDLE_DOT, ' ');
   }
 
   /// Get untransformed text
@@ -175,11 +177,13 @@ class CodeController extends TextEditingController {
       }
     }
     // Now fix the textfield for web
-    if (_webSpaceFix)
+    if (_webSpaceFix) {
       newValue = newValue.copyWith(text: _spacesToMiddleDots(newValue.text));
-    if (onChange != null)
+    }
+    if (onChange != null) {
       onChange!(
           _webSpaceFix ? _middleDotsToSpaces(newValue.text) : newValue.text);
+    }
     super.value = newValue;
   }
 
@@ -225,8 +229,9 @@ class CodeController extends TextEditingController {
       if (val != null) {
         if (_webSpaceFix) val = _spacesToMiddleDots(val);
         var child = TextSpan(text: val, style: theme?[node.className]);
-        if (styleRegExp != null)
+        if (styleRegExp != null) {
           child = _processPatterns(val, theme?[node.className]);
+        }
         currentSpans.add(child);
       } else if (nodeChildren != null) {
         List<TextSpan> tmp = [];
@@ -236,16 +241,20 @@ class CodeController extends TextEditingController {
         ));
         stack.add(currentSpans);
         currentSpans = tmp;
-        nodeChildren.forEach((n) {
+        for (var n in nodeChildren) {
           _traverse(n);
           if (n == nodeChildren.last) {
             currentSpans = stack.isEmpty ? children : stack.removeLast();
           }
-        });
+        }
       }
     }
 
-    if (nodes != null) for (var node in nodes) _traverse(node);
+    if (nodes != null) {
+      for (var node in nodes) {
+        _traverse(node);
+      }
+    }
     return TextSpan(style: style, children: children);
   }
 
@@ -255,25 +264,26 @@ class CodeController extends TextEditingController {
     // Retrieve pattern regexp
     final patternList = <String>[];
     if (_webSpaceFix) {
-      patternList.add("(" + _MIDDLE_DOT + ")");
-      styleList.add(TextStyle(color: Colors.transparent));
+      patternList.add('(' + _MIDDLE_DOT + ')');
+      styleList.add(const TextStyle(color: Colors.transparent));
     }
     if (stringMap != null) {
       patternList.addAll(stringMap!.keys.map((e) => r'(\b' + e + r'\b)'));
       styleList.addAll(stringMap!.values);
     }
     if (patternMap != null) {
-      patternList.addAll(patternMap!.keys.map((e) => "(" + e + ")"));
+      patternList.addAll(patternMap!.keys.map((e) => '(' + e + ')'));
       styleList.addAll(patternMap!.values);
     }
     styleRegExp = RegExp(patternList.join('|'), multiLine: true);
 
     // Return parsing
-    if (language != null)
+    if (language != null) {
       return _processLanguage(text, style);
-    else if (styleRegExp != null)
+    } else if (styleRegExp != null) {
       return _processPatterns(text, style);
-    else
+    } else {
       return TextSpan(text: text, style: style);
+    }
   }
 }

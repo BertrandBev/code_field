@@ -28,14 +28,14 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
 
   List<String?> get languageList {
     const TOP = <String>{
-      "java",
-      "cpp",
-      "python",
-      "javascript",
-      "cs",
-      "dart",
-      "haskell",
-      "ruby",
+      'java',
+      'cpp',
+      'python',
+      'javascript',
+      'cs',
+      'dart',
+      'haskell',
+      'ruby',
     };
     return <String?>[
       ...TOP,
@@ -46,12 +46,12 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
 
   List<String?> get themeList {
     const TOP = <String>{
-      "monokai-sublime",
-      "a11y-dark",
-      "an-old-hope",
-      "vs2015",
-      "vs",
-      "atom-one-dark",
+      'monokai-sublime',
+      'a11y-dark',
+      'an-old-hope',
+      'vs2015',
+      'vs',
+      'atom-one-dark',
     };
     return <String?>[
       ...TOP,
@@ -65,11 +65,11 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
     return DropdownButton<String>(
       value: value,
       items: choices.map((String? value) {
-        return new DropdownMenuItem<String>(
+        return DropdownMenuItem<String>(
           value: value,
           child: value == null
-              ? Divider()
-              : Text(value, style: TextStyle(color: Colors.white)),
+              ? const Divider()
+              : Text(value, style: const TextStyle(color: Colors.white)),
         );
       }).toList(),
       icon: Icon(icon, color: Colors.white),
@@ -91,13 +91,13 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
       setState(() => theme = val);
     });
     final dropdowns = Row(children: [
-      SizedBox(width: 12.0),
+      const SizedBox(width: 12.0),
       codeDropdown,
-      SizedBox(width: 12.0),
+      const SizedBox(width: 12.0),
       themeDropdown,
     ]);
     final codeField = InnerField(
-      key: ValueKey("$language - $theme"),
+      key: ValueKey('$language - $theme'),
       language: language!,
       theme: theme!,
     );
@@ -128,16 +128,16 @@ class _InnerFieldState extends State<InnerField> {
     _codeController = CodeController(
       text: CODE_SNIPPETS[widget.language],
       patternMap: {
-        r"\B#[a-zA-Z0-9]+\b": TextStyle(color: Colors.red),
-        r"\B@[a-zA-Z0-9]+\b": TextStyle(
+        r'\B#[a-zA-Z0-9]+\b': const TextStyle(color: Colors.red),
+        r'\B@[a-zA-Z0-9]+\b': const TextStyle(
           fontWeight: FontWeight.w800,
           color: Colors.blue,
         ),
-        r"\B![a-zA-Z0-9]+\b":
-            TextStyle(color: Colors.yellow, fontStyle: FontStyle.italic),
+        r'\B![a-zA-Z0-9]+\b':
+            const TextStyle(color: Colors.yellow, fontStyle: FontStyle.italic),
       },
       stringMap: {
-        "bev": TextStyle(color: Colors.indigo),
+        'bev': const TextStyle(color: Colors.indigo),
       },
       language: allLanguages[widget.language],
       theme: THEMES[widget.theme],
@@ -154,7 +154,7 @@ class _InnerFieldState extends State<InnerField> {
   Widget build(BuildContext context) {
     return CodeField(
       controller: _codeController!,
-      textStyle: TextStyle(fontFamily: 'SourceCode'),
+      textStyle: const TextStyle(fontFamily: 'SourceCode'),
     );
   }
 }

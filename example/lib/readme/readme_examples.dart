@@ -10,6 +10,8 @@ import 'package:flutter_highlight/themes/monokai-sublime.dart';
 import 'package:flutter_highlight/themes/a11y-dark.dart';
 
 class CodeEditor extends StatefulWidget {
+  const CodeEditor({Key? key}) : super(key: key);
+
   @override
   _CodeEditorState createState() => _CodeEditorState();
 }
@@ -20,7 +22,7 @@ class _CodeEditorState extends State<CodeEditor> {
   @override
   void initState() {
     super.initState();
-    final source = "";
+    const source = '';
     // Instantiate the CodeController
     _codeController = CodeController(
       text: source,
@@ -39,13 +41,15 @@ class _CodeEditorState extends State<CodeEditor> {
   Widget build(BuildContext context) {
     return CodeField(
       controller: _codeController!,
-      textStyle: TextStyle(fontFamily: 'SourceCode'),
+      textStyle: const TextStyle(fontFamily: 'SourceCode'),
       expands: true,
     );
   }
 }
 
 class CodeEditor1 extends StatefulWidget {
+  const CodeEditor1({Key? key}) : super(key: key);
+
   @override
   _CodeEditor1State createState() => _CodeEditor1State();
 }
@@ -56,7 +60,7 @@ class _CodeEditor1State extends State<CodeEditor1> {
   @override
   void initState() {
     super.initState();
-    final source = "void main() {\n    print(\"Hello, world!\");\n}";
+    const source = 'void main() {\n    print("Hello, world!");\n}';
     // Instantiate the CodeController
     _codeController = CodeController(
       text: source,
@@ -75,7 +79,7 @@ class _CodeEditor1State extends State<CodeEditor1> {
   Widget build(BuildContext context) {
     return CodeField(
       controller: _codeController!,
-      textStyle: TextStyle(fontFamily: 'SourceCode'),
+      textStyle: const TextStyle(fontFamily: 'SourceCode'),
     );
   }
 }
@@ -85,6 +89,8 @@ class _CodeEditor1State extends State<CodeEditor1> {
  */
 
 class CodeEditor2 extends StatefulWidget {
+  const CodeEditor2({Key? key}) : super(key: key);
+
   @override
   _CodeEditor2State createState() => _CodeEditor2State();
 }
@@ -95,15 +101,17 @@ class _CodeEditor2State extends State<CodeEditor2> {
   @override
   void initState() {
     super.initState();
-    final source = "void main() {\n    print(\"Hello, world!\");\n}";
+    const source = 'void main() {\n    print("Hello, world!");\n}';
     // Instantiate the CodeController
     _codeController = CodeController(
       text: source,
       language: dart,
       theme: monokaiSublimeTheme,
       stringMap: {
-        "Hello": TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
-        "world": TextStyle(fontStyle: FontStyle.italic, color: Colors.green),
+        'Hello':
+            const TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+        'world':
+            const TextStyle(fontStyle: FontStyle.italic, color: Colors.green),
       },
     );
   }
@@ -118,7 +126,7 @@ class _CodeEditor2State extends State<CodeEditor2> {
   Widget build(BuildContext context) {
     return CodeField(
       controller: _codeController!,
-      textStyle: TextStyle(fontFamily: 'SourceCode'),
+      textStyle: const TextStyle(fontFamily: 'SourceCode'),
     );
   }
 }
@@ -128,6 +136,8 @@ class _CodeEditor2State extends State<CodeEditor2> {
  */
 
 class CodeEditor3 extends StatefulWidget {
+  const CodeEditor3({Key? key}) : super(key: key);
+
   @override
   _CodeEditor3State createState() => _CodeEditor3State();
 }
@@ -138,15 +148,15 @@ class _CodeEditor3State extends State<CodeEditor3> {
   @override
   void initState() {
     super.initState();
-    final source = "void main() {\n    print(\"#Hello, #world!\");\n}";
+    const source = 'void main() {\n    print("#Hello, #world!");\n}';
     // Instantiate the CodeController
     _codeController = CodeController(
       text: source,
       language: dart,
       theme: monokaiSublimeTheme,
       patternMap: {
-        r"\B#[a-zA-Z0-9]+\b":
-            TextStyle(fontWeight: FontWeight.bold, color: Colors.purpleAccent),
+        r'\B#[a-zA-Z0-9]+\b': const TextStyle(
+            fontWeight: FontWeight.bold, color: Colors.purpleAccent),
       },
     );
   }
@@ -161,7 +171,7 @@ class _CodeEditor3State extends State<CodeEditor3> {
   Widget build(BuildContext context) {
     return CodeField(
       controller: _codeController!,
-      textStyle: TextStyle(fontFamily: 'SourceCode'),
+      textStyle: const TextStyle(fontFamily: 'SourceCode'),
     );
   }
 }
@@ -171,6 +181,8 @@ class _CodeEditor3State extends State<CodeEditor3> {
  */
 
 class CodeEditor4 extends StatefulWidget {
+  const CodeEditor4({Key? key}) : super(key: key);
+
   @override
   _CodeEditor4State createState() => _CodeEditor4State();
 }
@@ -181,17 +193,18 @@ class _CodeEditor4State extends State<CodeEditor4> {
   @override
   void initState() {
     super.initState();
-    final source = "void main() {\n    print(\"#Hello, #world!\");\n}";
+    const source = 'void main() {\n    print("#Hello, #world!");\n}';
     // Instantiate the CodeController
     _codeController = CodeController(
       text: source,
       patternMap: {
-        r'".*"': TextStyle(color: Colors.yellow),
-        r'[a-zA-Z0-9]+\(.*\)': TextStyle(color: Colors.green),
+        r'".*"': const TextStyle(color: Colors.yellow),
+        r'[a-zA-Z0-9]+\(.*\)': const TextStyle(color: Colors.green),
       },
       stringMap: {
-        "void": TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
-        "print": TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
+        'void': const TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+        'print':
+            const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
       },
     );
   }
@@ -206,14 +219,15 @@ class _CodeEditor4State extends State<CodeEditor4> {
   Widget build(BuildContext context) {
     return CodeField(
       controller: _codeController!,
-      textStyle: TextStyle(
+      textStyle: const TextStyle(
         fontFamily: 'SourceCode',
         // color: Colors.grey.shade100,
       ),
-      lineNumberStyle: LineNumberStyle(
-          textStyle: TextStyle(
-              // color: Colors.grey.shade500,
-              )),
+      lineNumberStyle: const LineNumberStyle(
+        textStyle: TextStyle(
+            // color: Colors.grey.shade500,
+            ),
+      ),
     );
   }
 }
@@ -223,6 +237,8 @@ class _CodeEditor4State extends State<CodeEditor4> {
  */
 
 class CodeEditor5 extends StatefulWidget {
+  const CodeEditor5({Key? key}) : super(key: key);
+
   @override
   _CodeEditor5State createState() => _CodeEditor5State();
 }
@@ -233,7 +249,7 @@ class _CodeEditor5State extends State<CodeEditor5> {
   @override
   void initState() {
     super.initState();
-    final source = """// An expensive but pretty
+    const source = '''// An expensive but pretty
 // recursive implementation
 int fibonacci(int n) {
   if (n <= 1) return n;
@@ -246,7 +262,7 @@ void main() {
   for (var n = 0; n < 10; n++)
     print(fibonacci(n));
 }
-""";
+''';
     // Instantiate the CodeController
     _codeController = CodeController(
       text: source,
@@ -265,7 +281,7 @@ void main() {
   Widget build(BuildContext context) {
     return CodeField(
       controller: _codeController!,
-      textStyle: TextStyle(fontFamily: 'SourceCode'),
+      textStyle: const TextStyle(fontFamily: 'SourceCode'),
       expands: true,
     );
   }

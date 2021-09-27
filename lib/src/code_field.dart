@@ -16,15 +16,16 @@ class LineNumberController extends TextEditingController {
   TextSpan buildTextSpan(
       {required BuildContext context, TextStyle? style, bool? withComposing}) {
     final children = <TextSpan>[];
-    final list = text.split("\n");
+    final list = text.split('\n');
     for (int k = 0; k < list.length; k++) {
       final el = list[k];
       final number = int.parse(el);
       var textSpan = TextSpan(text: el, style: style);
-      if (lineNumberBuilder != null)
+      if (lineNumberBuilder != null) {
         textSpan = lineNumberBuilder!(number, style);
+      }
       children.add(textSpan);
-      if (k < list.length - 1) children.add(TextSpan(text: "\n"));
+      if (k < list.length - 1) children.add(const TextSpan(text: '\n'));
     }
     return TextSpan(children: children, style: style);
   }
@@ -125,7 +126,7 @@ class CodeFieldState extends State<CodeField> {
   StreamSubscription<bool>? _keyboardVisibilitySubscription;
   FocusNode? _focusNode;
   String? lines;
-  String longestLine = "";
+  String longestLine = '';
 
   @override
   void initState() {
@@ -161,15 +162,15 @@ class CodeFieldState extends State<CodeField> {
 
   void _onTextChanged() {
     // Rebuild line number
-    final str = widget.controller.text.split("\n");
+    final str = widget.controller.text.split('\n');
     final buf = <String>[];
     for (var k = 0; k < str.length; k++) {
       buf.add((k + 1).toString());
     }
-    _numberController?.text = buf.join("\n");
+    _numberController?.text = buf.join('\n');
     // Find longest line
-    longestLine = "";
-    widget.controller.text.split("\n").forEach((line) {
+    longestLine = '';
+    widget.controller.text.split('\n').forEach((line) {
       if (line.length > longestLine.length) longestLine = line;
     });
     setState(() {});
@@ -222,12 +223,13 @@ class CodeFieldState extends State<CodeField> {
     if (widget.decoration != null) {
       backgroundCol = null;
     }
-    TextStyle textStyle = widget.textStyle ?? TextStyle();
+    TextStyle textStyle = widget.textStyle ?? const TextStyle();
     textStyle = textStyle.copyWith(
       color: textStyle.color ?? theme?[ROOT_KEY]?.color ?? defaultText,
       fontSize: textStyle.fontSize ?? 16.0,
     );
-    TextStyle numberTextStyle = widget.lineNumberStyle.textStyle ?? TextStyle();
+    TextStyle numberTextStyle =
+        widget.lineNumberStyle.textStyle ?? const TextStyle();
     final numberColor =
         (theme?[ROOT_KEY]?.color ?? defaultText).withOpacity(0.7);
     // Copy important attributes
@@ -248,7 +250,7 @@ class CodeFieldState extends State<CodeField> {
       maxLines: widget.maxLines,
       expands: widget.expands,
       scrollController: _numberScroll,
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         disabledBorder: InputBorder.none,
       ),
       textAlign: widget.lineNumberStyle.textAlign,
@@ -273,7 +275,7 @@ class CodeFieldState extends State<CodeField> {
       maxLines: widget.maxLines,
       expands: widget.expands,
       scrollController: _codeScroll,
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         disabledBorder: InputBorder.none,
         border: InputBorder.none,
         focusedBorder: InputBorder.none,

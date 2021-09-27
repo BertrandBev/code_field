@@ -6,10 +6,12 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,13 +20,13 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blueGrey,
       ),
-      home: HomePage(),
+      home: const HomePage(),
     );
   }
 }
 
 class HomePage extends StatefulWidget {
-  HomePage({Key? key}) : super(key: key);
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -57,11 +59,11 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final preset = <String>[
-      "dart|monokai-sublime",
-      "python|atom-one-dark",
-      "cpp|an-old-hope",
-      "java|a11y-dark",
-      "javascript|vs",
+      'dart|monokai-sublime',
+      'python|atom-one-dark',
+      'cpp|an-old-hope',
+      'java|a11y-dark',
+      'javascript|vs',
     ];
     List<Widget> children = preset.map((e) {
       final parts = e.split('|');
@@ -71,14 +73,14 @@ class _HomePageState extends State<HomePage> {
         theme: parts[1],
       );
       return Padding(
-        padding: EdgeInsets.only(bottom: 32.0),
+        padding: const EdgeInsets.only(bottom: 32.0),
         child: box,
       );
     }).toList();
     final page = Center(
       child: Container(
-        constraints: BoxConstraints(maxWidth: 900),
-        padding: EdgeInsets.symmetric(vertical: 32.0),
+        constraints: const BoxConstraints(maxWidth: 900),
+        padding: const EdgeInsets.symmetric(vertical: 32.0),
         child: Column(children: children),
       ),
     );
@@ -89,24 +91,24 @@ class _HomePageState extends State<HomePage> {
     // );
 
     return Scaffold(
-      backgroundColor: Color(0xFF363636),
+      backgroundColor: const Color(0xFF363636),
       appBar: AppBar(
-        backgroundColor: Color(0xff23241f),
-        title: Text("CodeField demo"),
+        backgroundColor: const Color(0xff23241f),
+        title: const Text('CodeField demo'),
         // title: Text("Recursive Fibonacci"),
         centerTitle: false,
         actions: [
           TextButton.icon(
             style: TextButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
               primary: Colors.white,
             ),
-            icon: Icon(FontAwesomeIcons.github),
+            icon: const Icon(FontAwesomeIcons.github),
             onPressed: () =>
-                _launchInBrowser("https://github.com/BertrandBev/code_field"),
-            label: Text("GITHUB"),
+                _launchInBrowser('https://github.com/BertrandBev/code_field'),
+            label: const Text('GITHUB'),
           ),
-          SizedBox(width: 8.0),
+          const SizedBox(width: 8.0),
         ],
       ),
       body: SingleChildScrollView(child: page),
