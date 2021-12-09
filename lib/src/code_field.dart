@@ -86,6 +86,9 @@ class CodeField extends StatefulWidget {
   /// {@macro flutter.widgets.textField.enabled}
   final bool? enabled;
 
+  /// {@macro flutter.widgets.editableText.onChanged}
+  final void Function(String)? onChanged;
+
   /// {@macro flutter.widgets.editableText.readOnly}
   final bool readOnly;
 
@@ -113,6 +116,7 @@ class CodeField extends StatefulWidget {
     this.textSelectionTheme,
     this.lineNumberBuilder,
     this.focusNode,
+    this.onChanged,
   }) : super(key: key);
 
   @override
@@ -286,6 +290,7 @@ class CodeFieldState extends State<CodeField> {
       autocorrect: false,
       enableSuggestions: false,
       enabled: widget.enabled,
+      onChanged: widget.onChanged,
       readOnly: widget.readOnly,
     );
 
