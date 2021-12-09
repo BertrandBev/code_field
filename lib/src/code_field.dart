@@ -89,6 +89,9 @@ class CodeField extends StatefulWidget {
   /// {@macro flutter.widgets.editableText.onChanged}
   final void Function(String)? onChanged;
 
+  /// {@macro flutter.widgets.editableText.readOnly}
+  final bool readOnly;
+
   final Color? background;
   final EdgeInsets padding;
   final Decoration? decoration;
@@ -108,6 +111,7 @@ class CodeField extends StatefulWidget {
     this.padding = const EdgeInsets.symmetric(),
     this.lineNumberStyle = const LineNumberStyle(),
     this.enabled,
+    this.readOnly = false,
     this.cursorColor,
     this.textSelectionTheme,
     this.lineNumberBuilder,
@@ -287,6 +291,7 @@ class CodeFieldState extends State<CodeField> {
       enableSuggestions: false,
       enabled: widget.enabled,
       onChanged: widget.onChanged,
+      readOnly: widget.readOnly,
     );
 
     final codeCol = Theme(
