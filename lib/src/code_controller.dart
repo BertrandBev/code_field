@@ -1,4 +1,6 @@
 import 'dart:math';
+
+import 'package:code_text_field/src/autocomplete/suggestion_generator.dart';
 import 'package:code_text_field/src/code_modifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -47,6 +49,7 @@ class CodeController extends TextEditingController {
   final styleList = <TextStyle>[];
   final modifierMap = <String, CodeModifier>{};
   RegExp? styleRegExp;
+  SuggestionGenerator? suggestionGenerator;
 
   CodeController({
     String? text,
@@ -74,6 +77,8 @@ class CodeController extends TextEditingController {
     modifiers.forEach((el) {
       modifierMap[el.char] = el;
     });
+    suggestionGenerator = SuggestionGenerator(
+        'language_id'); // TODO: replace string with some generated value for current language id
   }
 
   /// Replaces the current [selection] by [str]
