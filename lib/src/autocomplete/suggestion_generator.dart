@@ -1,8 +1,7 @@
-import 'dart:math';
-
 class SuggestionGenerator {
   RegExp identifierRegex = RegExp(r"^[_a-zA-Z][_a-zA-Z0-9]*$");
   String? languageID;
+
   //TODO: replace with a trie
   late List<String> dictionary;
 
@@ -79,7 +78,7 @@ class SuggestionGenerator {
     String prefix = '';
     int characterPosition = cursorPosition - 1;
     while (characterPosition >= 0 &&
-        identifierRegex.hasMatch(text[characterPosition])) {
+        identifierRegex.hasMatch(text[characterPosition] + prefix)) {
       prefix = text[characterPosition] + prefix;
       characterPosition--;
     }
