@@ -1,9 +1,13 @@
 import 'dart:math';
+import 'package:autotrie/autotrie.dart';
 
 class SuggestionGenerator {
   RegExp identifierRegex = RegExp(r"^[_a-zA-Z][_a-zA-Z0-9]*$");
   String? languageID;
-  //TODO: replace with a trie
+
+  final autoCompleteLanguage = AutoComplete(engine: SortEngine.entriesOnly());
+
+  final autoCompleteUser = AutoComplete(engine: SortEngine.entriesOnly());
   late List<String> dictionary;
 
   SuggestionGenerator(this.languageID) {
@@ -65,13 +69,16 @@ class SuggestionGenerator {
       'super',
       'while'
     ];
+
+    dictionary.forEach((element) {
+      autoCompleteLanguage.enter(element);
+    });
   }
 
-  // TODO: implement using tries
   List<String> getSuggestions(String text, int cursorPosition) {
     String word = _getCurrentIdentifierPrefix(text, cursorPosition);
     if (word.isEmpty) return [];
-    return dictionary.where((item) => item.startsWith(word)).toList();
+    return autoCompleteLanguage.suggest(word) + autoCompleteUser.suggest(word);
   }
 
   /// Returns the prefix of an identifier or a keyword that is pointed to by the cursor
@@ -84,5 +91,35 @@ class SuggestionGenerator {
       characterPosition--;
     }
     return prefix;
+  }
+
+  /// Parses text - gets user keywords and addes them into user trie
+  void parseText(String text) {
+    List<String> list = _getKeyWords(text);
+    list.forEach((element) {
+      autoCompleteUser.enter(element);
+    });
+    filterUserKeywords(text);
+  }
+
+  /// Delete from trie keywords that are not currently in editor text
+  void filterUserKeywords(String text) {
+    List<String> keywords = _getKeyWords(text);
+    final userKeyWords = autoCompleteUser.allEntries.toList();
+    final notInText =
+        userKeyWords.where((element) => !keywords.contains(element)).toList();
+    notInText.forEach((element) {
+      autoCompleteUser.delete(element);
+    });
+  }
+
+  /// Returns keywords from text
+  List<String> _getKeyWords(String text) {
+    List<String> keywords = text.split(RegExp(r"[^a-zA-Z0-9][^_a-zA-Z0-9]*"));
+    keywords.removeWhere((el) => el.isEmpty == true);
+    keywords.removeWhere((el) => dictionary.contains(el));
+    keywords.removeWhere((element) => !element.startsWith(RegExp(r"[a-zA-Z]")));
+    keywords = keywords.toSet().toList();
+    return keywords;
   }
 }
