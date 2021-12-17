@@ -2,7 +2,7 @@ import 'package:example/code_snippets.dart';
 import 'package:example/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:code_text_field/code_text_field.dart';
-import 'package:highlight/languages/all.dart';
+import 'package:code_text_field/languages/all.dart';
 
 class CustomCodeBox extends StatefulWidget {
   final String language;
@@ -29,18 +29,14 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
   List<String?> get languageList {
     const TOP = <String>{
       "java",
-      "cpp",
       "python",
-      "javascript",
-      "cs",
-      "dart",
-      "haskell",
-      "ruby",
+      "scala",
+      "go",
     };
     return <String?>[
       ...TOP,
-      null, // Divider
-      ...CODE_SNIPPETS.keys.where((el) => !TOP.contains(el))
+      // null, // Divider
+      // ...CODE_SNIPPETS.keys.where((el) => !TOP.contains(el))
     ];
   }
 
