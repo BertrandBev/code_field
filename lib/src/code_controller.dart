@@ -2,10 +2,10 @@ import 'dart:math';
 
 import 'package:code_text_field/src/autocomplete/suggestion_generator.dart';
 import 'package:code_text_field/src/code_modifier.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:highlight/highlight_core.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 const _MIDDLE_DOT = '·';
 
@@ -171,6 +171,7 @@ class CodeController extends TextEditingController {
       final char = newValue.text[loc];
       final modifier = modifierMap[char];
       final val = modifier?.updateString(rawText, selection, params);
+
       if (val != null) {
         // Update newValue
         newValue = newValue.copyWith(
@@ -179,6 +180,7 @@ class CodeController extends TextEditingController {
         );
       }
     }
+    bool hasTextChanged = newValue.text != super.value.text;
     // Now fix the textfield for web
     if (_webSpaceFix)
       newValue = newValue.copyWith(text: _spacesToMiddleDots(newValue.text));
@@ -186,6 +188,7 @@ class CodeController extends TextEditingController {
       onChange!(
           _webSpaceFix ? _middleDotsToSpaces(newValue.text) : newValue.text);
     super.value = newValue;
+    if (hasTextChanged) generateSuggestions();
   }
 
   TextSpan _processPatterns(String text, TextStyle? style) {
@@ -252,6 +255,10 @@ class CodeController extends TextEditingController {
 
     if (nodes != null) for (var node in nodes) _traverse(node);
     return TextSpan(style: style, children: children);
+  }
+
+  void generateSuggestions() {
+    suggestionGenerator!.getSuggestions(text, selection.start);
   }
 
   @override
