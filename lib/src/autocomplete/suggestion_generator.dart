@@ -115,10 +115,11 @@ class SuggestionGenerator {
 
   /// Returns keywords from text
   List<String> _getKeyWords(String text) {
-    List<String> keywords = text.split(RegExp(r"[^a-zA-Z0-9][^_a-zA-Z0-9]*"));
+    List<String> keywords = text.split(RegExp(r"[^_a-zA-Z0-9_][^_a-zA-Z0-9]*"));
     keywords.removeWhere((el) => el.isEmpty == true);
     keywords.removeWhere((el) => dictionary.contains(el));
-    keywords.removeWhere((element) => !element.startsWith(RegExp(r"[a-zA-Z]")));
+    keywords
+        .removeWhere((element) => !element.startsWith(RegExp(r"[a-zA-Z_]")));
     keywords = keywords.toSet().toList();
     return keywords;
   }
