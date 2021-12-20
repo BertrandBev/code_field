@@ -4,9 +4,7 @@ class SuggestionGenerator {
   RegExp identifierRegex = RegExp(r"^[_a-zA-Z0-9]+$");
   RegExp splitRegex = RegExp(r"[^_a-zA-Z0-9]+");
   String? languageID;
-
   final autoCompleteLanguage = AutoComplete(engine: SortEngine.entriesOnly());
-
   final autoCompleteUser = AutoComplete(engine: SortEngine.entriesOnly());
   late List<String> dictionary;
   late int cursorPosition;
@@ -30,10 +28,11 @@ class SuggestionGenerator {
   List<String> getSuggestions(String text, int cursorPosition) {
     this.cursorPosition = cursorPosition;
     this.text = text;
-    String word = _getCurrentWordPrefix();
-    if (word.isEmpty) return [];
-    parseText();
-    return autoCompleteLanguage.suggest(word) + autoCompleteUser.suggest(word);
+    String prefix = _getCurrentWordPrefix();
+    if (prefix.isEmpty) return [];
+    _parseText();
+    return autoCompleteLanguage.suggest(prefix) +
+        autoCompleteUser.suggest(prefix);
   }
 
   /// Returns the prefix of an identifier or a keyword that is pointed to by the cursor
@@ -61,17 +60,17 @@ class SuggestionGenerator {
   }
 
   /// Parses text - gets user keywords and adds them into user trie
-  void parseText() {
-    List<String> list = _getKeyWords();
+  void _parseText() {
+    List<String> list = _getTextKeywords();
     list.forEach((element) {
       autoCompleteUser.enter(element);
     });
-    filterUserKeywords();
+    _filterTextKeywords();
   }
 
   /// Delete from trie keywords that are not currently in editor text
-  void filterUserKeywords() {
-    List<String> keywords = _getKeyWords();
+  void _filterTextKeywords() {
+    List<String> keywords = _getTextKeywords();
     final userKeyWords = autoCompleteUser.allEntries.toList();
     final notInText =
         userKeyWords.where((element) => !keywords.contains(element)).toList();
@@ -81,7 +80,7 @@ class SuggestionGenerator {
   }
 
   /// Returns keywords from text
-  List<String> _getKeyWords() {
+  List<String> _getTextKeywords() {
     String processedText = _excludeCurrentWord();
     List<String> keywords = processedText.split(splitRegex);
     keywords.removeWhere((el) => el.isEmpty == true);
