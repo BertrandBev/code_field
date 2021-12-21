@@ -7,14 +7,14 @@ const KEYWORD = "type yield lazy override def with val var sealed abstract"
     " package default try this match continue throws implicit";
 
 final scala = Mode(refs: {
-  '~contains~5~contains~0': Mode(
+  'titlesMode': Mode(
       className: "title",
       begin:
           "[^0-9\\n\\t \"'(),.`{}\\[\\]:;][^\\n\\t \"'(),.`{}\\[\\]:;]+|[^0-9\\n\\t \"'(),.`{}\\[\\]:;=]",
       relevance: 0),
-  '~contains~4':
+  'typesMode':
       Mode(className: "type", begin: "\\b[A-Z][A-Za-z0-9_]*", relevance: 0),
-  '~contains~2~variants~2~contains~1': Mode(className: "subst", variants: [
+  'substringsMode': Mode(className: "subst", variants: [
     Mode(begin: "\\\$[A-Za-z0-9_]+"),
     Mode(begin: "\\\${", end: "}"),
   ]),
@@ -23,16 +23,13 @@ final scala = Mode(refs: {
     Mode(
         begin: "[a-z]+\"\"\"",
         end: "\"\"\"",
-        contains: [
-          BACKSLASH_ESCAPE,
-          Mode(ref: '~contains~2~variants~2~contains~1')
-        ],
+        contains: [BACKSLASH_ESCAPE, Mode(ref: 'substringsMode')],
         relevance: 10),
     Mode(begin: "\"", end: "\\n|\"", contains: [BACKSLASH_ESCAPE]),
-    Mode(begin: "[a-z]+\"", end: "\\n|\"", contains: [
-      BACKSLASH_ESCAPE,
-      Mode(ref: '~contains~2~variants~2~contains~1')
-    ]),
+    Mode(
+        begin: "[a-z]+\"",
+        end: "\\n|\"",
+        contains: [BACKSLASH_ESCAPE, Mode(ref: 'substringsMode')]),
   ]),
   'methodsMode': Mode(
     className: "bullet",
@@ -50,13 +47,13 @@ final scala = Mode(refs: {
   Mode(ref: "stringsMode"),
   Mode(ref: "methodsMode"),
   Mode(className: "symbol", begin: "'\\w[\\w\\d_]*(?!')"),
-  Mode(ref: '~contains~4'),
+  Mode(ref: 'typesMode'),
   Mode(
       className: "function",
       beginKeywords: "def",
       end: "[:={\\[(\\n;]",
       excludeEnd: true,
-      contains: [Mode(ref: '~contains~5~contains~0')]),
+      contains: [Mode(ref: 'titlesMode')]),
   Mode(
       className: "class",
       beginKeywords: "class object trait type",
@@ -70,7 +67,7 @@ final scala = Mode(refs: {
             excludeBegin: true,
             excludeEnd: true,
             relevance: 0,
-            contains: [Mode(ref: '~contains~4')]),
+            contains: [Mode(ref: 'typesMode')]),
         Mode(
             className: "params",
             begin: "\\(",
@@ -79,11 +76,11 @@ final scala = Mode(refs: {
             excludeEnd: true,
             relevance: 0,
             contains: [
-              Mode(ref: '~contains~4'),
+              Mode(ref: 'typesMode'),
               Mode(ref: 'stringsMode'),
               Mode(ref: 'methodsMode'),
             ]),
-        Mode(ref: '~contains~5~contains~0')
+        Mode(ref: 'titlesMode')
       ]),
   C_NUMBER_MODE,
   Mode(className: "meta", begin: "@[A-Za-z]+")
