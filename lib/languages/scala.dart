@@ -1,7 +1,5 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-
-import 'package:highlight/src/mode.dart';
-import 'package:highlight/src/common_modes.dart';
+import 'package:highlight/highlight_core.dart';
+import '../LanguagesModes/common_modes.dart';
 
 const KEYWORD = "type yield lazy override def with val var sealed abstract"
     " private trait object if forSome for while throw finally protected"
@@ -18,37 +16,41 @@ final scala = Mode(refs: {
       Mode(className: "type", begin: "\\b[A-Z][A-Za-z0-9_]*", relevance: 0),
   '~contains~2~variants~2~contains~1': Mode(className: "subst", variants: [
     Mode(begin: "\\\$[A-Za-z0-9_]+"),
-    Mode(begin: "\\\${", end: "}")
+    Mode(begin: "\\\${", end: "}"),
   ]),
-}, keywords: {
-  "literal": "true false null",
-  "keyword": KEYWORD,
-}, contains: [
-  C_LINE_COMMENT_MODE,
-  C_BLOCK_COMMENT_MODE,
-  Mode(className: "string", variants: [
-    Mode(begin: "\"", end: "\"", illegal: "\\n", contains: [BACKSLASH_ESCAPE]),
+  'stringsMode': Mode(className: "string", variants: [
     Mode(begin: "\"\"\"", end: "\"\"\"", relevance: 10),
-    Mode(begin: "[a-z]+\"", end: "\"", illegal: "\\n", contains: [
+    Mode(
+        begin: "[a-z]+\"\"\"",
+        end: "\"\"\"",
+        contains: [
+          BACKSLASH_ESCAPE,
+          Mode(ref: '~contains~2~variants~2~contains~1')
+        ],
+        relevance: 10),
+    Mode(begin: "\"", end: "\\n|\"", contains: [BACKSLASH_ESCAPE]),
+    Mode(begin: "[a-z]+\"", end: "\\n|\"", contains: [
       BACKSLASH_ESCAPE,
       Mode(ref: '~contains~2~variants~2~contains~1')
     ]),
-    Mode(
-        className: "string",
-        begin: "[a-z]+\"\"\"",
-        end: "\"\"\"",
-        contains: [Mode(ref: '~contains~2~variants~2~contains~1')],
-        relevance: 10)
   ]),
-  Mode(className: "symbol", begin: "'\\w[\\w\\d_]*(?!')"),
-  Mode(ref: '~contains~4'),
-  Mode(
+  'methodsMode': Mode(
     className: "bullet",
     begin: "\\.",
     end: "[^_A-Za-z0-9_-]",
     excludeBegin: true,
     excludeEnd: true,
   ),
+}, keywords: {
+  "literal": "true false null",
+  "keyword": KEYWORD,
+}, contains: [
+  C_LINE_COMMENT_MODE,
+  C_BLOCK_COMMENT_MODE,
+  Mode(ref: "stringsMode"),
+  Mode(ref: "methodsMode"),
+  Mode(className: "symbol", begin: "'\\w[\\w\\d_]*(?!')"),
+  Mode(ref: '~contains~4'),
   Mode(
       className: "function",
       beginKeywords: "def",
@@ -76,7 +78,11 @@ final scala = Mode(refs: {
             excludeBegin: true,
             excludeEnd: true,
             relevance: 0,
-            contains: [Mode(ref: '~contains~4')]),
+            contains: [
+              Mode(ref: '~contains~4'),
+              Mode(ref: 'stringsMode'),
+              Mode(ref: 'methodsMode'),
+            ]),
         Mode(ref: '~contains~5~contains~0')
       ]),
   C_NUMBER_MODE,

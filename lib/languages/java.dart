@@ -1,7 +1,5 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-
-import 'package:highlight/src/mode.dart';
-import 'package:highlight/src/common_modes.dart';
+import 'package:highlight/highlight_core.dart';
+import '../LanguagesModes/common_modes.dart';
 
 const String KEYWORD = "false synchronized abstract private static null if const"
     " for true while strictfp finally protected import native final void enum"

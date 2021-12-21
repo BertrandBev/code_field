@@ -1,7 +1,5 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-
-import 'package:highlight/src/mode.dart';
-import 'package:highlight/src/common_modes.dart';
+import 'package:highlight/highlight_core.dart';
+import '../LanguagesModes/common_modes.dart';
 
 const KEYWORD = "and elif is global as in if"
     " from raise for except finally print import pass return"
