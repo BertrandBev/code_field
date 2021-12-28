@@ -8,7 +8,7 @@ const KEYWORD = "and elif is global as in if"
 
 final python = Mode(
     refs: {
-      '~contains~3~variants~2~contains~3': Mode(
+      'substringMode': Mode(
           className: "subst",
           begin: "\\{",
           end: "\\}",
@@ -19,35 +19,35 @@ final python = Mode(
           },
           illegal: "#",
           contains: [
-            Mode(ref: '~contains~3'),
-            Mode(ref: '~contains~1'),
-            Mode(ref: '~contains~0')
+            Mode(ref: 'stringMode'),
+            Mode(ref: 'numberMode'),
+            Mode(ref: 'metaMode')
           ]),
-      '~contains~3~variants~2~contains~2': Mode(begin: "\\{\\{", relevance: 0),
-      '~contains~3': Mode(className: "string", contains: [
+      'simpleMode': Mode(begin: "\\{\\{", relevance: 0),
+      'stringMode': Mode(className: "string", contains: [
         BACKSLASH_ESCAPE
       ], variants: [
         Mode(
             begin: "(u|b)?r?'''",
             end: "'''",
-            contains: [BACKSLASH_ESCAPE, Mode(ref: '~contains~0')],
+            contains: [BACKSLASH_ESCAPE, Mode(ref: 'metaMode')],
             relevance: 10),
         Mode(
             begin: "(u|b)?r?\"\"\"",
             end: "\"\"\"",
-            contains: [BACKSLASH_ESCAPE, Mode(ref: '~contains~0')],
+            contains: [BACKSLASH_ESCAPE, Mode(ref: 'metaMode')],
             relevance: 10),
         Mode(begin: "(fr|rf|f)'''", end: "'''", contains: [
           BACKSLASH_ESCAPE,
-          Mode(ref: '~contains~0'),
-          Mode(ref: '~contains~3~variants~2~contains~2'),
-          Mode(ref: '~contains~3~variants~2~contains~3')
+          Mode(ref: 'metaMode'),
+          Mode(ref: 'simpleMode'),
+          Mode(ref: 'substringMode')
         ]),
         Mode(begin: "(fr|rf|f)\"\"\"", end: "\"\"\"", contains: [
           BACKSLASH_ESCAPE,
-          Mode(ref: '~contains~0'),
-          Mode(ref: '~contains~3~variants~2~contains~2'),
-          Mode(ref: '~contains~3~variants~2~contains~3')
+          Mode(ref: 'metaMode'),
+          Mode(ref: 'simpleMode'),
+          Mode(ref: 'substringMode')
         ]),
         Mode(begin: "(u|r|ur)'", end: "'", relevance: 10),
         Mode(begin: "(u|r|ur)\"", end: "\"", relevance: 10),
@@ -55,25 +55,25 @@ final python = Mode(
         Mode(begin: "(b|br)\"", end: "\""),
         Mode(begin: "(fr|rf|f)'", end: "'", contains: [
           BACKSLASH_ESCAPE,
-          Mode(ref: '~contains~3~variants~2~contains~2'),
-          Mode(ref: '~contains~3~variants~2~contains~3')
+          Mode(ref: 'simpleMode'),
+          Mode(ref: 'substringMode')
         ]),
         Mode(begin: "(fr|rf|f)\"", end: "\"", contains: [
           BACKSLASH_ESCAPE,
-          Mode(ref: '~contains~3~variants~2~contains~2'),
-          Mode(ref: '~contains~3~variants~2~contains~3')
+          Mode(ref: 'simpleMode'),
+          Mode(ref: 'substringMode')
         ]),
         APOS_STRING_MODE,
         QUOTE_STRING_MODE
       ]),
-      '~contains~1': Mode(className: "number", relevance: 0, variants: [
+      'numberMode': Mode(className: "number", relevance: 0, variants: [
         Mode(begin: "\\b(0b[01]+)[lLjJ]?"),
         Mode(begin: "\\b(0o[0-7]+)[lLjJ]?"),
         Mode(
             begin:
                 "(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)[lLjJ]?")
       ]),
-      '~contains~0': Mode(className: "meta", begin: "^(>>>|\\.\\.\\.) "),
+      'metaMode': Mode(className: "meta", begin: "^(>>>|\\.\\.\\.) "),
     },
     aliases: ["py", "gyp", "ipython"],
     keywords: {
@@ -91,10 +91,10 @@ final python = Mode(
         excludeBegin: true,
         excludeEnd: true,
       ),
-      Mode(ref: '~contains~0'),
-      Mode(ref: '~contains~1'),
+      Mode(ref: 'metaMode'),
+      Mode(ref: 'numberMode'),
       Mode(beginKeywords: "if", relevance: 0),
-      Mode(ref: '~contains~3'),
+      Mode(ref: 'stringMode'),
       HASH_COMMENT_MODE,
       Mode(
           variants: [
@@ -107,15 +107,15 @@ final python = Mode(
             UNDERSCORE_TITLE_MODE,
             Mode(className: "params", begin: "\\(", end: "\\)", contains: [
               Mode(self: true),
-              Mode(ref: '~contains~0'),
-              Mode(ref: '~contains~1'),
-              Mode(ref: '~contains~3'),
+              Mode(ref: 'metaMode'),
+              Mode(ref: 'numberMode'),
+              Mode(ref: 'stringMode'),
               HASH_COMMENT_MODE
             ]),
             Mode(begin: "->", endsWithParent: true, keywords: "None")
           ]),
       Mode(className: "meta", begin: "^[\\t ]*@", end: "\$", contains: [
-        Mode(ref: '~contains~3'),
+        Mode(ref: 'stringMode'),
       ]),
       Mode(begin: "\\b(print|exec)\\(")
     ]);

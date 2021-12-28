@@ -32,6 +32,7 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
       "python",
       "scala",
       "go",
+      "dart"
     };
     return <String?>[
       ...TOP,
