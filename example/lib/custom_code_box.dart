@@ -36,8 +36,6 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
     };
     return <String?>[
       ...TOP,
-      // null, // Divider
-      // ...CODE_SNIPPETS.keys.where((el) => !TOP.contains(el))
     ];
   }
 
