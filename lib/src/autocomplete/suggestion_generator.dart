@@ -29,7 +29,9 @@ class SuggestionGenerator {
     this.cursorPosition = cursorPosition;
     this.text = text;
     String prefix = _getCurrentWordPrefix();
-    if (prefix.isEmpty) return [];
+    if (prefix.isEmpty) {
+      return [];
+    }
     _parseText();
     return autoCompleteLanguage.suggest(prefix) +
         autoCompleteUser.suggest(prefix);
