@@ -160,7 +160,7 @@ class _InnerFieldState extends State<InnerField> {
             alignment: Alignment.topRight,
             child: FloatingActionButton(
               child: const Icon(Icons.format_align_left_outlined),
-              backgroundColor: Colors.purple[700],
+              backgroundColor: Colors.indigo[800],
               onPressed: (){
                 setState(() {
                   _codeController!.text = autoRefactor( _codeController!.text, widget.language);
