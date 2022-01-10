@@ -30,8 +30,8 @@ String removeExtraSpacesAndLines(String text, String language, int maxExtraLines
       else {
         final List<String> reTextInLines = refactorText.split('\n');
         if (reTextInLines.length >= maxExtraLines){
-          for (int j = 2; j < maxExtraLines; j++){
-            if (reTextInLines[reTextInLines.length - j] != ''){
+          for (int j = 1; j < maxExtraLines; j++){
+            if (reTextInLines[reTextInLines.length - 1 - j] != ''){
               refactorText += '\n';
               break;
             }
@@ -146,7 +146,14 @@ String removeExtraSpacesAndLines(String text, String language, int maxExtraLines
         refactorText += textInLines[i] + '\n';
       }
       else {
-        refactorText += textInLines[i].replaceAll(pattern, ' ') + '\n';
+        if (i != 0){
+          if (textInLines[i - 1] == ''){
+            refactorText += '\n' + textInLines[i].replaceAll(pattern, ' ') + '\n';
+          }
+        }
+        else {
+          refactorText += textInLines[i].replaceAll(pattern, ' ') + '\n';
+        }
       }
     }
   }
