@@ -180,10 +180,13 @@ class CodeController extends TextEditingController {
         );
       }
     }
+    
     bool hasTextChanged = newValue.text != super.value.text;
+    
+    //Because of this part of code ctrl + z dont't work. But maybe it's important, so please don't delete.
     // Now fix the textfield for web
-    if (_webSpaceFix)
-      newValue = newValue.copyWith(text: _spacesToMiddleDots(newValue.text));
+    // if (_webSpaceFix)
+    //   newValue = newValue.copyWith(text: _spacesToMiddleDots(newValue.text));
     if (onChange != null)
       onChange!(
           _webSpaceFix ? _middleDotsToSpaces(newValue.text) : newValue.text);
