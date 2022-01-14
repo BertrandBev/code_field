@@ -76,8 +76,8 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
       setState(() => theme = val);
     });
     final resetButton = TextButton.icon(
-      icon: const Icon(Icons.delete, color: Colors.white), 
-      label: const Text('Reset', style: TextStyle(color: Colors.white)),
+      icon: Icon(Icons.delete, color: Colors.white), 
+      label: Text('Reset', style: TextStyle(color: Colors.white)),
       onPressed: () {
         setState(() {
           reset = (!reset!);
@@ -90,13 +90,13 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
       color: Colors.deepPurple[900],
       child: Row(
         children: [
-        SizedBox(width: 25.0),
-        Text('Code editor', style: TextStyle(fontSize: 28, color: Colors.white),),
-        SizedBox(width: 510.0),
+        Spacer(flex: 2),
+        Text('Code editor', style: TextStyle(fontSize: 28, color: Colors.white)),
+        Spacer(flex: 35),
         codeDropdown,
-        SizedBox(width: 12.0),
+        Spacer(),
         themeDropdown,
-        SizedBox(width: 12.0),
+        Spacer(),
         resetButton
         ]
       )
