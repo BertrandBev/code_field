@@ -57,11 +57,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final preset = <String>[
-      "dart|monokai-sublime",
-      "python|atom-one-dark",
-      "cpp|an-old-hope",
-      "java|a11y-dark",
-      "javascript|vs",
+      "go|monokai-sublime",
     ];
     List<Widget> children = preset.map((e) {
       final parts = e.split('|');
