@@ -49,16 +49,16 @@ final python = Mode(
           Mode(ref: 'simpleMode'),
           Mode(ref: 'substringMode')
         ]),
-        Mode(begin: "(u|r|ur)'", end: "'", relevance: 10),
-        Mode(begin: "(u|r|ur)\"", end: "\"", relevance: 10),
-        Mode(begin: "(b|br)'", end: "'"),
-        Mode(begin: "(b|br)\"", end: "\""),
-        Mode(begin: "(fr|rf|f)'", end: "'", contains: [
+        Mode(begin: "(u|r|ur)'", end: "\\n|'", relevance: 10),
+        Mode(begin: "(u|r|ur)\"", end: "\\n|\"", relevance: 10),
+        Mode(begin: "(b|br)'", end: "\\n|'"),
+        Mode(begin: "(b|br)\"", end: "\\n|\""),
+        Mode(begin: "(fr|rf|f)'", end: "\\n|'", contains: [
           BACKSLASH_ESCAPE,
           Mode(ref: 'simpleMode'),
           Mode(ref: 'substringMode')
         ]),
-        Mode(begin: "(fr|rf|f)\"", end: "\"", contains: [
+        Mode(begin: "(fr|rf|f)\"", end: "\\n|\"", contains: [
           BACKSLASH_ESCAPE,
           Mode(ref: 'simpleMode'),
           Mode(ref: 'substringMode')
@@ -105,7 +105,12 @@ final python = Mode(
           illegal: "[\${=;\\n,]",
           contains: [
             UNDERSCORE_TITLE_MODE,
-            Mode(className: "params", begin: "\\(", end: "\\)", contains: [
+            Mode(className: "params", begin: "\\(", end: "\\)", keywords: {
+              "keyword": KEYWORD,
+              "built_in": "Ellipsis NotImplemented",
+              "literal": "False None True",
+              "type": "int str float list dict tup set bool",
+            }, contains: [
               Mode(self: true),
               Mode(ref: 'metaMode'),
               Mode(ref: 'numberMode'),
