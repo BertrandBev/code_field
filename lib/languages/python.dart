@@ -8,7 +8,7 @@ const KEYWORD = "and elif is global as in if"
 
 final python = Mode(
     refs: {
-      'substringsMode': Mode(
+      'substringMode': Mode(
           className: "subst",
           begin: "\\{",
           end: "\\}",
@@ -19,35 +19,35 @@ final python = Mode(
           },
           illegal: "#",
           contains: [
-            Mode(ref: 'stringsMode'),
-            Mode(ref: 'numbersMode'),
-            Mode(ref: 'metasMode')
+            Mode(ref: 'stringMode'),
+            Mode(ref: 'numberMode'),
+            Mode(ref: 'metaMode')
           ]),
       'simpleMode': Mode(begin: "\\{\\{", relevance: 0),
-      'stringsMode': Mode(className: "string", contains: [
+      'stringMode': Mode(className: "string", contains: [
         BACKSLASH_ESCAPE
       ], variants: [
         Mode(
             begin: "(u|b)?r?'''",
             end: "'''",
-            contains: [BACKSLASH_ESCAPE, Mode(ref: 'metasMode')],
+            contains: [BACKSLASH_ESCAPE, Mode(ref: 'metaMode')],
             relevance: 10),
         Mode(
             begin: "(u|b)?r?\"\"\"",
             end: "\"\"\"",
-            contains: [BACKSLASH_ESCAPE, Mode(ref: 'metasMode')],
+            contains: [BACKSLASH_ESCAPE, Mode(ref: 'metaMode')],
             relevance: 10),
         Mode(begin: "(fr|rf|f)'''", end: "'''", contains: [
           BACKSLASH_ESCAPE,
-          Mode(ref: 'metasMode'),
+          Mode(ref: 'metaMode'),
           Mode(ref: 'simpleMode'),
-          Mode(ref: 'substringsMode')
+          Mode(ref: 'substringMode')
         ]),
         Mode(begin: "(fr|rf|f)\"\"\"", end: "\"\"\"", contains: [
           BACKSLASH_ESCAPE,
-          Mode(ref: 'metasMode'),
+          Mode(ref: 'metaMode'),
           Mode(ref: 'simpleMode'),
-          Mode(ref: 'substringsMode')
+          Mode(ref: 'substringMode')
         ]),
         Mode(begin: "(u|r|ur)'", end: "\\n|'", relevance: 10),
         Mode(begin: "(u|r|ur)\"", end: "\\n|\"", relevance: 10),
@@ -56,24 +56,24 @@ final python = Mode(
         Mode(begin: "(fr|rf|f)'", end: "\\n|'", contains: [
           BACKSLASH_ESCAPE,
           Mode(ref: 'simpleMode'),
-          Mode(ref: 'substringsMode')
+          Mode(ref: 'substringMode')
         ]),
         Mode(begin: "(fr|rf|f)\"", end: "\\n|\"", contains: [
           BACKSLASH_ESCAPE,
           Mode(ref: 'simpleMode'),
-          Mode(ref: 'substringsMode')
+          Mode(ref: 'substringMode')
         ]),
         APOS_STRING_MODE,
         QUOTE_STRING_MODE
       ]),
-      'numbersMode': Mode(className: "number", relevance: 0, variants: [
+      'numberMode': Mode(className: "number", relevance: 0, variants: [
         Mode(begin: "\\b(0b[01]+)[lLjJ]?"),
         Mode(begin: "\\b(0o[0-7]+)[lLjJ]?"),
         Mode(
             begin:
                 "(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)[lLjJ]?")
       ]),
-      'metasMode': Mode(className: "meta", begin: "^(>>>|\\.\\.\\.) "),
+      'metaMode': Mode(className: "meta", begin: "^(>>>|\\.\\.\\.) "),
     },
     aliases: ["py", "gyp", "ipython"],
     keywords: {
@@ -91,10 +91,10 @@ final python = Mode(
         excludeBegin: true,
         excludeEnd: true,
       ),
-      Mode(ref: 'metasMode'),
-      Mode(ref: 'numbersMode'),
+      Mode(ref: 'metaMode'),
+      Mode(ref: 'numberMode'),
       Mode(beginKeywords: "if", relevance: 0),
-      Mode(ref: 'stringsMode'),
+      Mode(ref: 'stringMode'),
       HASH_COMMENT_MODE,
       Mode(
           variants: [
@@ -112,15 +112,15 @@ final python = Mode(
               "type": "int str float list dict tup set bool",
             }, contains: [
               Mode(self: true),
-              Mode(ref: 'metasMode'),
-              Mode(ref: 'numbersMode'),
-              Mode(ref: 'stringsMode'),
+              Mode(ref: 'metaMode'),
+              Mode(ref: 'numberMode'),
+              Mode(ref: 'stringMode'),
               HASH_COMMENT_MODE
             ]),
             Mode(begin: "->", endsWithParent: true, keywords: "None")
           ]),
       Mode(className: "meta", begin: "^[\\t ]*@", end: "\$", contains: [
-        Mode(ref: 'stringsMode'),
+        Mode(ref: 'stringMode'),
       ]),
       Mode(begin: "\\b(print|exec)\\(")
     ]);

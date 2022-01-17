@@ -1,8 +1,7 @@
-import 'package:example/code_snippets.dart';
-import 'package:example/themes.dart';
+import 'themes.dart';
 import 'package:flutter/material.dart';
-import 'package:code_text_field/code_text_field.dart';
-import 'package:code_text_field/languages/all.dart';
+import 'code_text_field.dart';
+import 'package:highlight/languages/all.dart';
 
 class CustomCodeBox extends StatefulWidget {
   final String language;
@@ -18,53 +17,43 @@ class CustomCodeBox extends StatefulWidget {
 class _CustomCodeBoxState extends State<CustomCodeBox> {
   String? language;
   String? theme;
+  bool? reset;
 
   @override
   void initState() {
     super.initState();
     language = widget.language;
     theme = widget.theme;
+    reset = false;
   }
 
-  List<String?> get languageList {
-    const TOP = <String>{
-      "java",
-      "python",
-      "scala",
-      "go",
-      "dart"
-    };
-    return <String?>[
-      ...TOP,
-    ];
-  }
+  List<String?> languageList = <String>[
+    "java",
+    "go",
+    "python",
+    "scala",
+    "dart"
+  ];
 
-  List<String?> get themeList {
-    const TOP = <String>{
-      "monokai-sublime",
-      "a11y-dark",
-      "an-old-hope",
-      "vs2015",
-      "vs",
-      "atom-one-dark",
-    };
-    return <String?>[
-      ...TOP,
-      null, // Divider
-      ...THEMES.keys.where((el) => !TOP.contains(el))
-    ];
-  }
+  List<String?> themeList  = <String>[
+    "monokai-sublime",
+    "a11y-dark",
+    "an-old-hope",
+    "vs2015",
+    "vs",
+    "atom-one-dark"
+  ];
 
   Widget buildDropdown(Iterable<String?> choices, String value, IconData icon,
       Function(String?) onChanged) {
     return DropdownButton<String>(
       value: value,
       items: choices.map((String? value) {
-        return new DropdownMenuItem<String>(
+        return DropdownMenuItem<String>(
           value: value,
           child: value == null
-              ? Divider()
-              : Text(value, style: TextStyle(color: Colors.white)),
+              ? const Divider()
+              : Text(value, style: const TextStyle(color: Colors.white)),
         );
       }).toList(),
       icon: Icon(icon, color: Colors.white),
@@ -85,19 +74,39 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
       if (val == null) return;
       setState(() => theme = val);
     });
-    final dropdowns = Row(children: [
-      SizedBox(width: 12.0),
-      codeDropdown,
-      SizedBox(width: 12.0),
-      themeDropdown,
-    ]);
+    final resetButton = TextButton.icon(
+      icon: Icon(Icons.delete, color: Colors.white), 
+      label: Text('Reset', style: TextStyle(color: Colors.white)),
+      onPressed: () {
+        setState(() {
+          reset = (!reset!);
+        });
+      }, 
+    );
+
+    final buttons = Container (
+      height: MediaQuery.of(context).size.height/13,
+      color: Colors.deepPurple[900],
+      child: Row(
+        children: [
+        Spacer(flex: 2),
+        Text('Code editor', style: TextStyle(fontSize: 28, color: Colors.white)),
+        Spacer(flex: 35),
+        codeDropdown,
+        Spacer(),
+        themeDropdown,
+        Spacer(),
+        resetButton
+        ]
+      )
+    );
     final codeField = InnerField(
-      key: ValueKey("$language - $theme"),
+      key: ValueKey("$language - $theme - $reset"),
       language: language!,
       theme: theme!,
     );
     return Column(children: [
-      dropdowns,
+      buttons,
       codeField,
     ]);
   }
@@ -121,19 +130,6 @@ class _InnerFieldState extends State<InnerField> {
   void initState() {
     super.initState();
     _codeController = CodeController(
-      text: CODE_SNIPPETS[widget.language],
-      patternMap: {
-        r"\B#[a-zA-Z0-9]+\b": TextStyle(color: Colors.red),
-        r"\B@[a-zA-Z0-9]+\b": TextStyle(
-          fontWeight: FontWeight.w800,
-          color: Colors.blue,
-        ),
-        r"\B![a-zA-Z0-9]+\b":
-            TextStyle(color: Colors.yellow, fontStyle: FontStyle.italic),
-      },
-      stringMap: {
-        "bev": TextStyle(color: Colors.indigo),
-      },
       language: allLanguages[widget.language],
       theme: THEMES[widget.theme],
     );
@@ -147,9 +143,16 @@ class _InnerFieldState extends State<InnerField> {
 
   @override
   Widget build(BuildContext context) {
-    return CodeField(
-      controller: _codeController!,
-      textStyle: TextStyle(fontFamily: 'SourceCode'),
+    
+    return Container(
+      color: _codeController!.theme!['root']!.backgroundColor,
+      height: MediaQuery.of(context).size.height / 13 * 12,
+      child: SingleChildScrollView(
+        child: CodeField(
+          controller: _codeController!,
+          textStyle: const TextStyle(fontFamily: 'SourceCode'),
+        )
+      ),
     );
   }
 }
