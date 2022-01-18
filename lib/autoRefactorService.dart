@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'autoRefactoringSettings.dart' as refact;
 import 'dart:convert';
 
@@ -5,16 +7,16 @@ String autoRefactor(String text, String language){
   String refactorText = "";
   Map<String, dynamic> settings = jsonDecode(refact.settings);
   refactorText = removeExtraSpacesAndLines(text, language, int.parse(settings['max_extra_lines']));
-  for (int i = 0; i < settings['linebreak_after_this_brackets'].length; i++){
-    refactorText = addLineBreakAfterBracket(refactorText, '', 
-                            settings['linebreak_after_this_brackets'][i], ''.padRight(int.parse(settings['intend']), ' '));
-  }
+  refactorText = refactorText.trimRight();
+  final List<String> textInLines = refactorText.split('\n');
+  refactorText = addLineBreakAfterBracket(textInLines, '', 
+                          settings['linebreak_after_this_brackets'], ''.padRight(int.parse(settings['intend']), ' '));
   if (language == 'python') { 
-    refactorText = addLineBreakAfterFunctionColon(refactorText);
+    refactorText = addLineBreakAfterFunctionColon(refactorText, ''.padRight(int.parse(settings['intend'])));
   }
   refactorText = refactorText.trimRight();
-  if (settings['add_line_in_the_end'].toLowerCase() == "true"){
-    refactorText += '\n';
+  if (settings['add_line_at_the_end'] == "true"){
+    refactorText += '\n ';
   }
   return refactorText;
 }
@@ -68,7 +70,7 @@ String removeExtraSpacesAndLines(String text, String language, int maxExtraLines
           }
         }
         else {
-          refactorText += lineSplitedQuote[j].trim().replaceAll(pattern, ' ');
+          refactorText += ' ' + lineSplitedQuote[j].trim().replaceAll(pattern, ' ') + ' ';
           if (open) multLine = true;
         }
       }
@@ -109,7 +111,7 @@ String removeExtraSpacesAndLines(String text, String language, int maxExtraLines
           }
         }
         else {
-          refactorText += lineSplitedQuote[j].trim().replaceAll(pattern, ' ');
+          refactorText += ' ' + lineSplitedQuote[j].trim().replaceAll(pattern, ' ') + ' ';
           if (open) multLine = true;
         }
       }
@@ -135,7 +137,7 @@ String removeExtraSpacesAndLines(String text, String language, int maxExtraLines
         final List<String> lineSplitedQuote = textInLines[i].split(quote);
         for (int j = 0 ; j < lineSplitedQuote.length; j++){
           if (j % 2 == 0) {
-            refactorText += lineSplitedQuote[j].trim().replaceAll(pattern, ' ');
+            refactorText += ' ' + lineSplitedQuote[j].trim().replaceAll(pattern, ' ') + ' ';
           }
           else {
             refactorText += quote + lineSplitedQuote[j] + quote;
@@ -156,56 +158,100 @@ String removeExtraSpacesAndLines(String text, String language, int maxExtraLines
   return refactorText;
 }
 
-String addLineBreakAfterBracket(String text, String intend, String bracket, String settings){
-  String refactorText = "";
+String addLineBreakAfterBracket(List<String> textInLines, String intend, List<dynamic> brackets, String settings){
   //In dart, java, go, scala { is the designation of the beginning of a function
   //In python instead of the {, the : .
-  final List<String> textInLines = text.split('\n');
-  for (int i = 0; i < textInLines.length; i++){
+  textInLines.removeLast();
+  String text = textInLines.join('\n');
+  if (brackets.length < 1) {
+    return text;
+  }
+  List<int> indexes = [];
+  for (int i = 0; i < brackets.length; i++){
+    int firstIndex = text.indexOf(brackets[i][0]);
+    int secondIndex = text.indexOf(brackets[i][1]);
+    if (firstIndex != -1 && secondIndex != -1){
+      indexes.add(firstIndex<secondIndex ? firstIndex : secondIndex);
+    }
+    else if (firstIndex != -1){
+      indexes.add(firstIndex);
+    }
+    else{
+      indexes.add(secondIndex);
+    }
+  }
+  int min = indexes.reduce(max);
+  int indexOfmin = 0;
+  for (int i = 0;i < indexes.length; i++){
+    if (indexes[i] < min && indexes[i] != -1){
+      min = indexes[i];
+      indexOfmin = i;
+    }
+  }
+  String bracket = brackets[indexOfmin];
+  
+  String refactorText = "";
+  int i = 0;
+  while(textInLines.length - i > 0){
     if (textInLines[i].contains(bracket[0])) {
       int indexOfBracket = textInLines[i].indexOf(bracket[0]);
       String beforeBracket = textInLines[i].substring(0, indexOfBracket + 1);
       String afterBracket = textInLines[i].substring(indexOfBracket + 1);
+      List<String> subList = textInLines.sublist(i+1);
+      List<String> subListWithAfterBracket = subList;
+      if (afterBracket.trim() != '')
+        subListWithAfterBracket.insert(0, afterBracket);
       if (afterBracket.trim() == ''){
-        refactorText += intend + beforeBracket + '\n';
+        refactorText += intend + beforeBracket + '\n'
+                            + addLineBreakAfterBracket(subList, intend + settings, brackets, settings);
       }
       else {
         refactorText += intend + beforeBracket + '\n' 
-                            + addLineBreakAfterBracket(afterBracket, intend + settings, bracket, settings);
+              + addLineBreakAfterBracket(subListWithAfterBracket, intend + settings, brackets, settings);
       }
+      return refactorText;
     }
     else if (textInLines[i].contains(bracket[1])){
       int indexOfBracket = textInLines[i].indexOf(bracket[1]);
       String beforeBracket = textInLines[i].substring(0, indexOfBracket);
       String afterBracket = textInLines[i].substring(indexOfBracket + 1);
       String newIntend = intend.length > settings.length ? intend.substring(settings.length) : '';
+      List<String> subList = textInLines.sublist(i+1);
+      List<String> subListWithAfterBracket = subList;
+      if (afterBracket.trim() != ''){
+        subListWithAfterBracket.insert(0, afterBracket);
+      }
       if (beforeBracket.trim() == ''){
         if (afterBracket.trim() == ''){
-          refactorText += newIntend + bracket[1] + '\n';
+          refactorText += newIntend + bracket[1] + '\n'
+                            + addLineBreakAfterBracket(subList, newIntend, brackets, settings);
         }
         else {
           refactorText += newIntend + bracket[1] + '\n' 
-                            + addLineBreakAfterBracket(afterBracket, newIntend, bracket, settings);
+                + addLineBreakAfterBracket(subListWithAfterBracket, newIntend, brackets, settings);
         }
       }
       else {
         if (afterBracket.trim() == '') {
-          refactorText += intend + beforeBracket + '\n ' + newIntend + bracket[1] + '\n';
+          refactorText += intend + beforeBracket + '\n ' + newIntend + bracket[1] + '\n'
+                             + addLineBreakAfterBracket(subList, newIntend, brackets, settings);
         }
         else {
           refactorText += intend + beforeBracket + '\n ' + newIntend + bracket[1] + '\n' 
-                            + addLineBreakAfterBracket(afterBracket, newIntend, bracket, settings);
+                + addLineBreakAfterBracket(subListWithAfterBracket, newIntend, brackets, settings);
         }
       }
+      return refactorText;
     }
     else {
-        refactorText += intend + textInLines[i] + '\n';
+      refactorText += intend + textInLines[i].trimLeft() + '\n';
+      i++;
     }
   }
   return refactorText;
 }
 
-String addLineBreakAfterFunctionColon(String text){
+String addLineBreakAfterFunctionColon(String text, String intend){
   String refactorText = "";
   final List<String> textInLines= text.split('\n');
   for (int i = 0; i < textInLines.length; i++){
@@ -213,7 +259,12 @@ String addLineBreakAfterFunctionColon(String text){
       int indexOfColon = textInLines[i].indexOf(':');
       String beforeColon = textInLines[i].substring(0, indexOfColon + 1);
       String afterColon = textInLines[i].substring(indexOfColon + 1);
-      refactorText +=  beforeColon + '\n' + addLineBreakAfterFunctionColon(afterColon);
+      if (afterColon.trim() != ''){
+        refactorText +=  beforeColon + '\n' + intend + addLineBreakAfterFunctionColon(afterColon, intend);
+      }
+      else {
+        refactorText += textInLines[i] + '\n';
+      }
     }
     else {
       refactorText += textInLines[i] + '\n';
