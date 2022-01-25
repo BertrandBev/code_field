@@ -290,7 +290,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> addLineBreakAfterBr
     Tuple2<bool, int> containsFirstBracket = symbolContains(bracket[0], textInLines[i], indexesOfStrings[i]);
     Tuple2<bool, int> containsSecondBracket = symbolContains(bracket[1], textInLines[i], indexesOfStrings[i]);
 
-    if (containsFirstBracket.item1) {
+    if (containsFirstBracket.item1 && (containsSecondBracket.item2 == -1 || containsFirstBracket.item2 < containsSecondBracket.item2)) {
       int indexOfBracket = containsFirstBracket.item2;
       String beforeBracket = textInLines[i].substring(0, indexOfBracket + 1);
       String afterBracket = textInLines[i].substring(indexOfBracket + 1);
@@ -313,9 +313,6 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> addLineBreakAfterBr
           if (indexesOfStrings[i].item2[j].item1 > indexOfBracket){
             indexesForAfterBracket.add(Tuple2(indexesOfStrings[i].item2[j].item1 - indexOfBracket - 1, 
                                                           indexesOfStrings[i].item2[j].item2 - indexOfBracket - 1));
-          }
-          else if (indexesOfStrings[i].item2[j].item2 > indexOfBracket){
-            indexesForAfterBracket.add(Tuple2(0, indexesOfStrings[i].item2[j].item2 - indexOfBracket - 1));
           }
         }
         indexesOfStringsWithAfterBracket.insert(0,Tuple2(indexesForAfterBracket.isNotEmpty ? 
@@ -406,9 +403,6 @@ String addLineBreakAfterFunctionColon(String text, String intend, List<Tuple2<St
         for (int j = 0; j < indexesOfStrings[i].item2.length; j++){
           if (indexesOfStrings[i].item2[j].item1 > indexOfColon){
             indexesForAfterColon.add(Tuple2(indexesOfStrings[i].item2[j].item1 - indexOfColon - 1, indexesOfStrings[i].item2[j].item2 - indexOfColon - 1));
-          }
-          else if (indexesOfStrings[i].item2[j].item2 > indexOfColon){
-            indexesForAfterColon.add(Tuple2(0, indexesOfStrings[i].item2[j].item2 - indexOfColon - 1));
           }
         }
         indexesForAfterColonList.add(Tuple2(indexesForAfterColon.isNotEmpty ? haveString : simple, indexesForAfterColon));
