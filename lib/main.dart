@@ -1,7 +1,8 @@
 //File only for testing. Later file will be deleted.
-import 'custom_code_box.dart';
 import 'package:flutter/material.dart';
-import 'constants.dart';
+
+import 'constants/constants.dart';
+import 'custom_code_box.dart';
 
 void main() {
   runApp(const CodeEditor());
