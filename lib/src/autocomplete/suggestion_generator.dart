@@ -25,12 +25,20 @@ class SuggestionGenerator {
     return jsonConfig;
   }
 
+  List<String> getKeywords(Map<String, dynamic> config) {
+    return config["keywords"].toString().split(" ");
+  }
+
+  List<String> getSnipplets(Map<String, dynamic> config) {
+    return [...config["snipplets"]];
+  }
+
   /// Placeholder for dictionary initialization using json resource files for the given language
   void initDictionary() async {
     Map<String, dynamic> jsonConfig = await getConfig();
 
-    List<String> keywords = jsonConfig["keywords"].toString().split(" ");
-    List<String> snipplets = [...jsonConfig["snipplets"]];
+    List<String> keywords = getKeywords(jsonConfig);
+    List<String> snipplets = getSnipplets(jsonConfig);
 
     keywords.forEach((element) {
       autoCompleteLanguage.enter(element);
