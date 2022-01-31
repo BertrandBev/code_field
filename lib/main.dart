@@ -1,8 +1,6 @@
 //File only for testing. Later file will be deleted.
-import 'package:flutter/material.dart';
-
-import 'constants/constants.dart';
 import 'custom_code_box.dart';
+import 'package:flutter/material.dart';
 
 void main() {
   runApp(const CodeEditor());
@@ -17,7 +15,7 @@ class CodeEditor extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: CustomCodeBox(
-            language: dart,
+            language: 'dart',
             theme: 'monokai-sublime',
           ),
       ) 
