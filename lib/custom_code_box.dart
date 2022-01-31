@@ -1,10 +1,7 @@
+import 'themes.dart';
 import 'package:flutter/material.dart';
-import 'package:highlight/languages/all.dart';
-
-import 'autoRefactorService.dart';
 import 'code_text_field.dart';
-import 'constants/constants.dart';
-import 'constants/themes.dart';
+import 'package:highlight/languages/all.dart';
 
 class CustomCodeBox extends StatefulWidget {
   final String language;
@@ -31,11 +28,11 @@ class _CustomCodeBoxState extends State<CustomCodeBox> {
   }
 
   List<String?> languageList = <String>[
-    java,
-    go,
-    python,
-    scala,
-    dart
+    "java",
+    "go",
+    "python",
+    "scala",
+    "dart"
   ];
 
   List<String?> themeList  = <String>[
@@ -150,28 +147,12 @@ class _InnerFieldState extends State<InnerField> {
     return Container(
       color: _codeController!.theme!['root']!.backgroundColor,
       height: MediaQuery.of(context).size.height / 13 * 12,
-      child: Stack(
-        children: [
-          SingleChildScrollView(
-            child: CodeField(
-              controller: _codeController!,
-              textStyle: const TextStyle(fontFamily: 'SourceCode'),
-            )
-          ),
-          Align(
-            alignment: Alignment.topRight,
-            child: FloatingActionButton(
-              child: const Icon(Icons.format_align_left_outlined),
-              backgroundColor: Colors.indigo[800],
-              onPressed: (){
-                setState(() {
-                  _codeController!.text = autoRefactor( _codeController!.text, widget.language);
-                });
-              }
-            )
-          )
-        ]
-      )
+      child: SingleChildScrollView(
+        child: CodeField(
+          controller: _codeController!,
+          textStyle: const TextStyle(fontFamily: 'SourceCode'),
+        )
+      ),
     );
   }
 }
