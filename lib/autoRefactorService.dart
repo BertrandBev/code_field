@@ -76,6 +76,8 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
   text = text.trim();
   final List<String> textInLines = text.split('\n');
   final pattern = RegExp('\\s\\s+');
+  final singleQuotePattern = RegExp(r"[^\\]'|^'");
+  final doubleQuotePattern = RegExp(r'[^\\]"|^"');
   bool multiline = false;
   for (int i = 0; i < textInLines.length; i++) {
     if (textInLines[i] == '' || textInLines[i].trim() == '') {
@@ -140,7 +142,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
       indexes.add(Tuple2(haveString,result[2]));
       refactorText += result[0] + (oneLine ? '' : '\n');
     }
-    else if (textInLines[i].contains(RegExp(r'[^\\]"|^"')) || textInLines[i].contains(RegExp(r"[^\\]'|^'"))){
+    else if (textInLines[i].contains(doubleQuotePattern) || textInLines[i].contains(singleQuotePattern)){
       if (multiline){
         refactorText += textInLines[i];
       }
@@ -174,7 +176,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
         }
         regex1 = quote == '"' ? doubleQuoteRex1 : singleQuoteRex1;
         regex2 = quote == '"' ? doubleQuoteRex2 : singleQuoteRex2;
-        fullOtherRegex = quote == '"' ? RegExp(r"[^\\]'|^'") : RegExp(r'[^\\]"|^"');
+        fullOtherRegex = quote == '"' ? singleQuotePattern : doubleQuotePattern;
 
         List<Tuple2<int, int>> indexesOfline = [];
         int beforeIndex = 0;
