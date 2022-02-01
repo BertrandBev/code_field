@@ -44,8 +44,6 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
   text = text.trim();
   final List<String> textInLines = text.split('\n');
   final pattern = RegExp('\\s\\s+');
-  final singleQuotePattern = RegExp(r"[^\\]'|^'");
-  final doubleQuotePattern = RegExp(r'[^\\]"|^"');
   bool multiline = false;
   String multilineQuotes = '';
   for (int i = 0; i < textInLines.length; i++) {
@@ -89,6 +87,19 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
           int indexSingleMultiQuote = mutableString.indexOf('\'\'\'');
           symbols.addAll(['"""', '\'\'\'']);
           firstIndexesOfSymbols.addAll([indexDoubMultiQuote, indexSingleMultiQuote]);
+        }
+        
+        if (language == python){
+          int indexOfHash = mutableString.indexOf('#');
+          symbols.add('#');
+          firstIndexesOfSymbols.add(indexOfHash);
+        }
+        else {
+          int indexOfSlashes = mutableString.indexOf('//');
+          int startIndex = mutableString.indexOf('/*');
+          int endIndex = mutableString.indexOf('*/');
+          symbols.addAll(['//', '/*', '*/']);
+          firstIndexesOfSymbols.addAll([indexOfSlashes, startIndex, endIndex]);
         }
 
         RegExp singleQuoteRex1 = RegExp(r"[^\\]'");
@@ -138,8 +149,18 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
           refactorText += beforeSymbol;
           mutableString =  mutableString.replaceRange(0, firstIndexesOfSymbols[indexOfmin] + symbol.length, '');
           beforeIndex += beforeSymbol.length;
-          
-          if (symbol == '"""' || symbol == "'''" || symbol == '`'){
+
+          if (symbol == '#' || symbol == '//'){
+            if (multiline){
+              indexesOfline.add(Tuple2(0, beforeIndex - 1));
+            }
+            else {
+              refactorText += mutableString;
+              indexesOfline.add(Tuple2(beforeIndex, beforeIndex + mutableString.length - 1));
+              mutableString = "";
+            }
+          }
+          else if (symbol == '"""' || symbol == "'''" || symbol == '`' || symbol == '/*' || symbol == '*/'){
             if (multiline){
               if (multilineQuotes == symbol){
                 indexesOfline.add(Tuple2(0, beforeIndex - 1));
@@ -150,12 +171,12 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
               }
             }
             else {
-              int secondIndex = mutableString.indexOf(symbol);
+              int secondIndex = mutableString.indexOf(symbol == '/*' ? '*/' : symbol);
               if (secondIndex == -1){
                 refactorText += mutableString;
                 indexesOfline.add(Tuple2(beforeIndex, beforeIndex + mutableString.length - 1));
                 mutableString = "";
-                multilineQuotes = symbol;
+                multilineQuotes = symbol == '/*' ? '*/' : symbol;
                 multiline = true;
               }
               else{
@@ -185,17 +206,6 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
                 refactorText += inQuotes;
                 mutableString =  mutableString.replaceRange(0, secondIndex + symbol.length, '');
               }
-            }
-          }
-          else {
-            if (multiline){
-              refactorText += mutableString + '\n';
-              mutableString = '';
-              indexesOfline.add(Tuple2(beforeIndex, beforeIndex + mutableString.length));
-            }
-            else {
-              refactorText += mutableString.replaceAll(pattern, ' ') + '\n';
-              mutableString = '';
             }
           }
         }
