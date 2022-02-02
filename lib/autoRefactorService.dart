@@ -126,7 +126,7 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
             mutableString = '';
           }
           else {
-            refactorText += mutableString.replaceAll(pattern, ' ');
+            refactorText += mutableString.replaceAll(pattern, ' ').trimLeft();
             mutableString = '';
           }
         }
@@ -141,7 +141,8 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
           String symbol = symbols[indexOfmin];
           String beforeSymbol;
           if (!multiline) {
-            beforeSymbol = mutableString.substring(0, firstIndexesOfSymbols[indexOfmin] + symbol.length).replaceAll(pattern, ' ');
+            beforeSymbol = mutableString.substring(0, 
+                                        firstIndexesOfSymbols[indexOfmin] + symbol.length).replaceAll(pattern, ' ').trimLeft();
           }
           else {
             beforeSymbol = mutableString.substring(0, firstIndexesOfSymbols[indexOfmin] + symbol.length);
