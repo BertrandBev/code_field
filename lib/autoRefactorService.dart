@@ -18,7 +18,7 @@ String autoRefactor(String text, String language){
   Map<String, dynamic> settings = jsonDecode(refactorSettings);
   List<Tuple2<String, List<Tuple2<int, int>>>> indexes;
   Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> result = removeExtraSpacesAndLines(text, 
-                                                                      language, int.parse(settings['max_extra_lines']), false);
+                                                                      language, int.parse(settings['max_extra_lines']));
   refactorText = result.item1;
   indexes = result.item2;
   refactorText = refactorText.trimRight();
@@ -37,48 +37,15 @@ String autoRefactor(String text, String language){
   return refactorText;
 }
 
-List<dynamic> multilineFunctions(String text, String firstQuotes, String quote, bool multiline, String language, int maxExtraLines){
-  final List<String> lineSplitedQuote = text.split(quote);
-  List<Tuple2<int, int>> indexesOfline = [];
-  String refactorText = '';
-  int beforeIndex = 0;
-  for (int j = 0 ; j < lineSplitedQuote.length; j++){
-    String newLine;
-    if (multiline) {
-      if (j < lineSplitedQuote.length - 1) {
-        newLine = firstQuotes + lineSplitedQuote[j] + quote;
-        multiline = false;
-      }
-      else {
-        newLine = quote + lineSplitedQuote[j];
-      }
-      indexesOfline.add(Tuple2(beforeIndex, beforeIndex + newLine.length - 1));
-    }
-    else {
-      Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> result = 
-                                                removeExtraSpacesAndLines(lineSplitedQuote[j], language, maxExtraLines, true);
-      newLine = result.item1;
-      for (int z = 0; z < result.item2[0].item2.length; z++){
-        indexesOfline.add(Tuple2(beforeIndex + result.item2[0].item2[z].item1, beforeIndex + result.item2[0].item2[z].item2));
-      }
-      multiline = true;
-    }
-    refactorText += newLine;
-    beforeIndex += newLine.length;
-  }
-  return [refactorText, multiline, indexesOfline];
-}
-
 Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAndLines(String text, String language, 
-                                                                  int maxExtraLines, bool oneLine){
+                                                                  int maxExtraLines){
   List<Tuple2<String, List<Tuple2<int, int>>>> indexes = [];
   String refactorText = "";
   text = text.trim();
   final List<String> textInLines = text.split('\n');
   final pattern = RegExp('\\s\\s+');
-  final singleQuotePattern = RegExp(r"[^\\]'|^'");
-  final doubleQuotePattern = RegExp(r'[^\\]"|^"');
   bool multiline = false;
+  String multilineQuotes = '';
   for (int i = 0; i < textInLines.length; i++) {
     if (textInLines[i] == '' || textInLines[i].trim() == '') {
       if (multiline) {
@@ -97,129 +64,156 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
           }
         }
         else {
-          refactorText += (oneLine ? '' : '\n');
+          refactorText += '\n';
           indexes.add(Tuple2(simple, []));
         }
       }
     }
-    else if (language == go && textInLines[i].contains('`')){
-      //In dart, python, java, scala for multiline use """. In go use `.
-      String firstQuotes;
-      if (multiline) {
-        firstQuotes = '';
-      } 
-      else {
-        firstQuotes = '`';
-      }
-      List<dynamic> result = multilineFunctions(textInLines[i], firstQuotes, '`', multiline, language, maxExtraLines);
-      multiline = result[1];
-      indexes.add(Tuple2(haveString,result[2]));
-      refactorText += result[0] + (oneLine ? '' : '\n');
-    }
-    else if (language != go && (textInLines[i].contains('"""') || textInLines[i].contains('\'\'\''))){
-      //In dart, python, java, scala for multiline use """. In go use `.
-      String quote;
-      int indexDoubQuote = textInLines[i].indexOf('"""');
-      int indexSingleQuote = textInLines[i].indexOf('\'\'\'');
-      if (indexDoubQuote == -1) {
-        quote = '\'\'\'';
-      } 
-      else if (indexSingleQuote == -1){
-        quote = '"""';
-      } 
-      else {
-        quote = indexDoubQuote < indexSingleQuote ? '"""' : '\'\'\'';
-      }
-      String firstQuotes;
-      if (multiline){
-        firstQuotes = '';
-      } 
-      else {
-        firstQuotes = quote;
-      }
-      List<dynamic> result = multilineFunctions(textInLines[i], firstQuotes, quote, multiline, language, maxExtraLines);
-      multiline = result[1];
-      indexes.add(Tuple2(haveString,result[2]));
-      refactorText += result[0] + (oneLine ? '' : '\n');
-    }
-    else if (textInLines[i].contains(doubleQuotePattern) || textInLines[i].contains(singleQuotePattern)){
-      if (multiline){
-        refactorText += textInLines[i];
-      }
-      else {
+    else {
+      String mutableString = textInLines[i];
+      List<Tuple2<int, int>> indexesOfline = [];
+      int beforeIndex = 0;
+      while (mutableString.length > 0){
+        List<String> symbols = [];
+        List<int> firstIndexesOfSymbols = [];
+
+        if (language == go){
+          int indexMultiLineGo = mutableString.indexOf('`');
+          symbols.add('`');
+          firstIndexesOfSymbols.add(indexMultiLineGo);
+        }
+        else {
+          int indexDoubMultiQuote = mutableString.indexOf('"""');
+          int indexSingleMultiQuote = mutableString.indexOf('\'\'\'');
+          symbols.addAll(['"""', '\'\'\'']);
+          firstIndexesOfSymbols.addAll([indexDoubMultiQuote, indexSingleMultiQuote]);
+        }
+        
+        if (language == python){
+          int indexOfHash = mutableString.indexOf('#');
+          symbols.add('#');
+          firstIndexesOfSymbols.add(indexOfHash);
+        }
+        else {
+          int indexOfSlashes = mutableString.indexOf('//');
+          int startIndex = mutableString.indexOf('/*');
+          int endIndex = mutableString.indexOf('*/');
+          symbols.addAll(['//', '/*', '*/']);
+          firstIndexesOfSymbols.addAll([indexOfSlashes, startIndex, endIndex]);
+        }
+
         RegExp singleQuoteRex1 = RegExp(r"[^\\]'");
         RegExp singleQuoteRex2 = RegExp(r"^'");
         RegExp doubleQuoteRex1 = RegExp(r'[^\\]"');
         RegExp doubleQuoteRex2 = RegExp(r'^"');
-        
-        RegExp fullOtherRegex;
-        RegExp regex1;
-        RegExp regex2;
-        String quote;
 
-        int indexDoubleQuote1 = textInLines[i].indexOf(doubleQuoteRex1);
-        int indexDoubleQuote2 = textInLines[i].indexOf(doubleQuoteRex2);
+        int indexDoubleQuote1 = mutableString.indexOf(doubleQuoteRex1);
+        int indexDoubleQuote2 = mutableString.indexOf(doubleQuoteRex2);
         int indexDoubQuote = indexDoubleQuote2 == -1 ? (indexDoubleQuote1 == -1 ? -1 : indexDoubleQuote1 + 1) : indexDoubleQuote2;
 
-        int indexSingleQuote1 = textInLines[i].indexOf(singleQuoteRex1);
-        int indexSingleQuote2 = textInLines[i].indexOf(singleQuoteRex2);
+        int indexSingleQuote1 = mutableString.indexOf(singleQuoteRex1);
+        int indexSingleQuote2 = mutableString.indexOf(singleQuoteRex2);
         int indexSingleQuote = indexSingleQuote2 == -1 ? (indexSingleQuote1 == -1 ? -1 : indexSingleQuote1 + 1) : indexSingleQuote2;
 
-        if (indexDoubQuote == -1) {
-          quote = "'";
-        } 
-        else if (indexSingleQuote == -1) {
-          quote = '"';
-        } 
-        else {
-          quote = indexDoubQuote < indexSingleQuote ? '"' : "'";
+        symbols.addAll(['\'', '"']);
+        firstIndexesOfSymbols.addAll([indexSingleQuote, indexDoubQuote]);
+
+        int minIndexOfSymbols = firstIndexesOfSymbols.reduce(max);
+        if (minIndexOfSymbols == -1){
+          if (multiline){
+            refactorText += mutableString;
+            indexes.add(Tuple2(multline, []));
+            mutableString = '';
+          }
+          else {
+            refactorText += mutableString.replaceAll(pattern, ' ').trimLeft();
+            mutableString = '';
+          }
         }
-        regex1 = quote == '"' ? doubleQuoteRex1 : singleQuoteRex1;
-        regex2 = quote == '"' ? doubleQuoteRex2 : singleQuoteRex2;
-        fullOtherRegex = quote == '"' ? singleQuotePattern : doubleQuotePattern;
-
-        List<Tuple2<int, int>> indexesOfline = [];
-        int beforeIndex = 0;
-        int firstIndex = quote == '\''? indexSingleQuote : indexDoubQuote;
-        int secondIndex = textInLines[i].indexOf(regex1, firstIndex + 1);
-        secondIndex = secondIndex == -1 ? textInLines[i].indexOf(regex2, firstIndex + 1) : secondIndex + 1;
-
-        while (firstIndex != -1 && secondIndex != -1){
-          String lineBeforeQuote = textInLines[i].substring(beforeIndex, firstIndex).replaceAll(pattern, ' ');
-          if (lineBeforeQuote.contains(fullOtherRegex)){
-            Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> result = 
-                                                          removeExtraSpacesAndLines(lineBeforeQuote, language, maxExtraLines, true);
-            for (int z = 0; z < result.item2[0].item2.length; z++){
-              indexesOfline.add(Tuple2(beforeIndex + result.item2[0].item2[z].item1, beforeIndex + result.item2[0].item2[z].item2));
+        else {
+          int indexOfmin = firstIndexesOfSymbols.indexOf(minIndexOfSymbols);
+          for (int i = 0; i < firstIndexesOfSymbols.length; i++){
+            if (firstIndexesOfSymbols[i] < minIndexOfSymbols && firstIndexesOfSymbols[i] != -1){
+              minIndexOfSymbols = firstIndexesOfSymbols[i];
+              indexOfmin = i;
             }
           }
-          refactorText += lineBeforeQuote;
+          String symbol = symbols[indexOfmin];
+          String beforeSymbol;
+          if (!multiline) {
+            beforeSymbol = mutableString.substring(0, 
+                                        firstIndexesOfSymbols[indexOfmin] + symbol.length).replaceAll(pattern, ' ').trimLeft();
+          }
+          else {
+            beforeSymbol = mutableString.substring(0, firstIndexesOfSymbols[indexOfmin] + symbol.length);
+          }
+          refactorText += beforeSymbol;
+          mutableString =  mutableString.replaceRange(0, firstIndexesOfSymbols[indexOfmin] + symbol.length, '');
+          beforeIndex += beforeSymbol.length;
 
-          String lineInQuotes = textInLines[i].substring(firstIndex + 1, secondIndex);
-          indexesOfline.add(Tuple2(firstIndex, secondIndex));
-          refactorText += quote + lineInQuotes + quote;
-
-          beforeIndex += lineBeforeQuote.length + lineInQuotes.length + 2;
-          firstIndex = textInLines[i].indexOf(regex1, secondIndex + 1);
-          firstIndex = firstIndex == -1 ? textInLines[i].indexOf(regex2, secondIndex + 1) : firstIndex + 1;
-          if (firstIndex != -1) {
-            secondIndex = textInLines[i].indexOf(regex1, firstIndex + 1);
-            secondIndex = secondIndex == -1 ? textInLines[i].indexOf(regex2, firstIndex + 1) : secondIndex + 1;
+          if (symbol == '#' || symbol == '//'){
+            if (multiline){
+              indexesOfline.add(Tuple2(0, beforeIndex - 1));
+            }
+            else {
+              refactorText += mutableString;
+              indexesOfline.add(Tuple2(beforeIndex, beforeIndex + mutableString.length - 1));
+              mutableString = "";
+            }
+          }
+          else if (symbol == '"""' || symbol == "'''" || symbol == '`' || symbol == '/*' || symbol == '*/'){
+            if (multiline){
+              if (multilineQuotes == symbol){
+                indexesOfline.add(Tuple2(0, beforeIndex - 1));
+                multiline = false;
+              }
+              else {
+                indexesOfline.add(Tuple2(0, beforeIndex - 1));
+              }
+            }
+            else {
+              int secondIndex = mutableString.indexOf(symbol == '/*' ? '*/' : symbol);
+              if (secondIndex == -1){
+                refactorText += mutableString;
+                indexesOfline.add(Tuple2(beforeIndex, beforeIndex + mutableString.length - 1));
+                mutableString = "";
+                multilineQuotes = symbol == '/*' ? '*/' : symbol;
+                multiline = true;
+              }
+              else{
+                String inQuotes = mutableString.substring(0, secondIndex + symbol.length);
+                indexesOfline.add(Tuple2(beforeIndex, beforeIndex + inQuotes.length - 1));
+                beforeIndex += inQuotes.length;
+                refactorText += inQuotes;
+                mutableString =  mutableString.replaceRange(0, secondIndex + symbol.length, '');
+              }
+            }
+          }
+          else if (symbol == '"' || symbol == '\''){
+            if (multiline){
+              indexesOfline.add(Tuple2(0, beforeIndex));
+            }
+            else {
+              int secondIndex1 = mutableString.indexOf(symbol == '"' ? doubleQuoteRex1 : singleQuoteRex1);
+              int secondIndex2 = mutableString.indexOf(symbol == '"' ? doubleQuoteRex2 : singleQuoteRex2);
+              int secondIndex = secondIndex2 == -1 ? (secondIndex1 == -1 ? -1 : secondIndex1 + 1) : secondIndex2;
+              if (secondIndex == -1){
+                refactorText += mutableString;
+              }
+              else {
+                String inQuotes = mutableString.substring(0, secondIndex + symbol.length);
+                indexesOfline.add(Tuple2(beforeIndex, beforeIndex + inQuotes.length - 1));
+                beforeIndex += inQuotes.length;
+                refactorText += inQuotes;
+                mutableString =  mutableString.replaceRange(0, secondIndex + symbol.length, '');
+              }
+            }
           }
         }
-
-        indexes.add(Tuple2(haveString,indexesOfline));
-        refactorText += (oneLine ? '' : '\n');
       }
-    }
-    else {
-      if (multiline){
-        refactorText += textInLines[i] + '\n';
-        indexes.add(Tuple2(multline, []));
-      }
-      else {
-        refactorText += textInLines[i].trim().replaceAll(pattern, ' ') + (oneLine ? '' : '\n');
-        indexes.add(Tuple2(simple, []));
+      refactorText += '\n';
+      if (indexes.length - 1 != i){
+        indexes.add(Tuple2(haveString, indexesOfline));
       }
     }
   }
@@ -393,15 +387,26 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> addLineBreakAfterBr
     }
     else {
       if (indexesOfStrings[i].item1 != multline){
-        int lengthOfIntend = textInLines[i].length - textInLines[i].trimLeft().length;
-        List<Tuple2<int, int>> indexesForBeforeBracket = [];
-        for (int j = 0; j < indexesOfStrings[i].item2.length; j++){
-          indexesForBeforeBracket.add(Tuple2(indexesOfStrings[i].item2[j].item1 - lengthOfIntend + intend.length, 
+        if (indexesOfStrings[i].item2.length > 0){
+          if (indexesOfStrings[i].item2[0].item1 != 0) {
+            int lengthOfIntend = textInLines[i].length - textInLines[i].trimLeft().length;
+            List<Tuple2<int, int>> indexesForBeforeBracket = [];
+            for (int j = 0; j < indexesOfStrings[i].item2.length; j++){
+              indexesForBeforeBracket.add(Tuple2(indexesOfStrings[i].item2[j].item1 - lengthOfIntend + intend.length, 
                                               indexesOfStrings[i].item2[j].item2 - lengthOfIntend + intend.length));
+            }
+            refactorText += intend + textInLines[i].trimLeft() + '\n';
+            newIndexesOfStrings.add(Tuple2(haveString, indexesForBeforeBracket));
+          }
+          else {
+            refactorText += textInLines[i] + '\n';
+            newIndexesOfStrings.add(indexesOfStrings[i]);
+          }
         }
-        newIndexesOfStrings.add(Tuple2(indexesForBeforeBracket.isNotEmpty ? haveString : simple, indexesForBeforeBracket));
-
-        refactorText += intend + textInLines[i].trimLeft() + '\n';
+        else {
+          refactorText += intend + textInLines[i].trimLeft() + '\n';
+          newIndexesOfStrings.add(Tuple2(simple, []));
+        }
       }
       else {
         refactorText += textInLines[i] + '\n';
