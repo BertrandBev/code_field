@@ -118,8 +118,8 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
         symbols.addAll(['\'', '"']);
         firstIndexesOfSymbols.addAll([indexSingleQuote, indexDoubQuote]);
 
-        int min = firstIndexesOfSymbols.reduce(max);
-        if (min == -1){
+        int minIndexOfSymbols = firstIndexesOfSymbols.reduce(max);
+        if (minIndexOfSymbols == -1){
           if (multiline){
             refactorText += mutableString;
             indexes.add(Tuple2(multline, []));
@@ -131,10 +131,10 @@ Tuple2<String, List<Tuple2<String, List<Tuple2<int, int>>>>> removeExtraSpacesAn
           }
         }
         else {
-          int indexOfmin = firstIndexesOfSymbols.indexOf(min);
+          int indexOfmin = firstIndexesOfSymbols.indexOf(minIndexOfSymbols);
           for (int i = 0; i < firstIndexesOfSymbols.length; i++){
-            if (firstIndexesOfSymbols[i] < min && firstIndexesOfSymbols[i] != -1){
-              min = firstIndexesOfSymbols[i];
+            if (firstIndexesOfSymbols[i] < minIndexOfSymbols && firstIndexesOfSymbols[i] != -1){
+              minIndexOfSymbols = firstIndexesOfSymbols[i];
               indexOfmin = i;
             }
           }
