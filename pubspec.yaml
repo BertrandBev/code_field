@@ -23,5 +23,5 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/keywords
+    - assets/keywords/
     - assets/settings/autoRefactoringSettings.json
