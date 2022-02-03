@@ -1,4 +1,7 @@
+import 'dart:collection';
+import 'dart:convert';
 import 'package:autotrie/autotrie.dart';
+import 'package:flutter/services.dart';
 
 class SuggestionGenerator {
   RegExp identifierRegex = RegExp(r"^[_a-zA-Z0-9]+$");
@@ -6,35 +9,60 @@ class SuggestionGenerator {
   String? languageID;
   final autoCompleteLanguage = AutoComplete(engine: SortEngine.entriesOnly());
   final autoCompleteUser = AutoComplete(engine: SortEngine.entriesOnly());
-  late List<String> dictionary;
+  final autoCompleteSnipplets = AutoComplete(engine: SortEngine.entriesOnly());
   late int cursorPosition;
   late String text;
 
   SuggestionGenerator(this.languageID) {
-    this.dictionary = [];
     this.cursorPosition = 0;
     this.text = '';
     initDictionary();
   }
 
+  Future<Map<String, dynamic>> getConfig() async {
+    String config = await rootBundle.loadString('dart.json');
+    Map<String, dynamic> jsonConfig = jsonDecode(config);
+    return jsonConfig;
+  }
+
+  List<String> getKeywords(Map<String, dynamic> config) {
+    return config["keywords"].toString().split(" ");
+  }
+
+  List<String> getSnipplets(Map<String, dynamic> config) {
+    return [...config["snipplets"]];
+  }
+
   /// Placeholder for dictionary initialization using json resource files for the given language
   void initDictionary() async {
-    this.dictionary = [];
-    dictionary.forEach((element) {
+    Map<String, dynamic> jsonConfig = await getConfig();
+
+    List<String> keywords = getKeywords(jsonConfig);
+    List<String> snipplets = getSnipplets(jsonConfig);
+
+    keywords.forEach((element) {
       autoCompleteLanguage.enter(element);
+    });
+
+    snipplets.forEach((element) {
+      autoCompleteSnipplets.enter(element);
     });
   }
 
-  List<String> getSuggestions(String text, int cursorPosition) {
+  HashMap<String, List<String>> getSuggestions(
+      String text, int cursorPosition) {
     this.cursorPosition = cursorPosition;
     this.text = text;
     String prefix = _getCurrentWordPrefix();
     if (prefix.isEmpty) {
-      return [];
+      return HashMap();
     }
     _parseText();
-    return autoCompleteLanguage.suggest(prefix) +
-        autoCompleteUser.suggest(prefix);
+    HashMap<String, List<String>> suggestions = new HashMap();
+    suggestions["local"] = autoCompleteUser.suggest(prefix);
+    suggestions["language"] = autoCompleteLanguage.suggest(prefix);
+    suggestions["snipplets"] = autoCompleteSnipplets.suggest(prefix);
+    return suggestions;
   }
 
   /// Returns the prefix of an identifier or a keyword that is pointed to by the cursor
@@ -86,7 +114,8 @@ class SuggestionGenerator {
     String processedText = _excludeCurrentWord();
     List<String> keywords = processedText.split(splitRegex);
     keywords.removeWhere((el) => el.isEmpty == true);
-    keywords.removeWhere((el) => dictionary.contains(el));
+    keywords.removeWhere(
+        (el) => autoCompleteLanguage.allEntries.toList().contains(el));
     keywords
         .removeWhere((element) => !element.startsWith(RegExp(r"[a-zA-Z_]")));
     keywords = keywords.toSet().toList();
