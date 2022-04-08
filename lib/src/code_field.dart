@@ -150,6 +150,7 @@ class CodeFieldState extends State<CodeField> {
   }
 
   KeyEventResult _onKey(FocusNode node, RawKeyEvent event) {
+    if (widget.readOnly) return KeyEventResult.ignored;
     return widget.controller.onKey(event);
   }
 
