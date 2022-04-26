@@ -76,6 +76,11 @@ class CodeController extends TextEditingController {
     });
   }
 
+  /// Sets a specific cursor position in the text
+  void setCursor(int offset) {
+    selection = TextSelection.collapsed(offset: offset);
+  }
+
   /// Replaces the current [selection] by [str]
   void insertStr(String str) {
     final sel = selection;
