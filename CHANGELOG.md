@@ -38,3 +38,9 @@
 * added onChange callback
 * added enabled flag
 * fixed middle dot issue
+
+## [1.0.3] - 2022-05-02
+
+* added onTap to CodeField API
+* fixed tab behavior in read-only mode
+* added setCursor method to CodeController

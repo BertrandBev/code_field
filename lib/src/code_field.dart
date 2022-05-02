@@ -124,13 +124,12 @@ class CodeField extends StatefulWidget {
 }
 
 class CodeFieldState extends State<CodeField> {
-// Add a controller
+  // Add a controller
   LinkedScrollControllerGroup? _controllers;
   ScrollController? _numberScroll;
   ScrollController? _codeScroll;
   LineNumberController? _numberController;
 
-  //
   StreamSubscription<bool>? _keyboardVisibilitySubscription;
   FocusNode? _focusNode;
   String? lines;
@@ -146,7 +145,7 @@ class CodeFieldState extends State<CodeField> {
     widget.controller.addListener(_onTextChanged);
     _focusNode = widget.focusNode ?? FocusNode();
     _focusNode!.onKey = _onKey;
-    // _focusNode!.attach(context, onKey: _onKey);
+    _focusNode!.attach(context, onKey: _onKey);
 
     _onTextChanged();
   }

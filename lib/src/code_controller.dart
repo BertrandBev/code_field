@@ -14,7 +14,7 @@ class EditorParams {
 }
 
 class CodeController extends TextEditingController {
-  /// A highligh language to parse the text with
+  /// A highlight language to parse the text with
   final Mode? language;
 
   /// The theme to apply to the [language] parsing result
@@ -64,8 +64,7 @@ class CodeController extends TextEditingController {
     this.onChange,
   }) : super(text: text) {
     // PatternMap
-    if (language != null && theme == null)
-      throw Exception("A theme must be provided for language parsing");
+    if (language != null && theme == null) throw Exception("A theme must be provided for language parsing");
     // Register language
     if (language != null) {
       highlight.registerLanguage(languageId, language!);
@@ -153,8 +152,7 @@ class CodeController extends TextEditingController {
     const _chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
     final _rnd = Random();
     return String.fromCharCodes(
-      Iterable.generate(
-          10, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))),
+      Iterable.generate(10, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))),
     );
   }
 
@@ -180,11 +178,8 @@ class CodeController extends TextEditingController {
       }
     }
     // Now fix the textfield for web
-    if (_webSpaceFix)
-      newValue = newValue.copyWith(text: _spacesToMiddleDots(newValue.text));
-    if (onChange != null)
-      onChange!(
-          _webSpaceFix ? _middleDotsToSpaces(newValue.text) : newValue.text);
+    if (_webSpaceFix) newValue = newValue.copyWith(text: _spacesToMiddleDots(newValue.text));
+    if (onChange != null) onChange!(_webSpaceFix ? _middleDotsToSpaces(newValue.text) : newValue.text);
     super.value = newValue;
   }
 
@@ -195,11 +190,7 @@ class CodeController extends TextEditingController {
       onMatch: (Match m) {
         if (styleList.isEmpty) return '';
         int idx;
-        for (idx = 1;
-            idx < m.groupCount &&
-                idx <= styleList.length &&
-                m.group(idx) == null;
-            idx++) {}
+        for (idx = 1; idx < m.groupCount && idx <= styleList.length && m.group(idx) == null; idx++) {}
         children.add(TextSpan(
           text: m[0],
           style: styleList[idx - 1],
@@ -230,8 +221,7 @@ class CodeController extends TextEditingController {
       if (val != null) {
         if (_webSpaceFix) val = _spacesToMiddleDots(val);
         var child = TextSpan(text: val, style: theme?[node.className]);
-        if (styleRegExp != null)
-          child = _processPatterns(val, theme?[node.className]);
+        if (styleRegExp != null) child = _processPatterns(val, theme?[node.className]);
         currentSpans.add(child);
       } else if (nodeChildren != null) {
         List<TextSpan> tmp = [];
@@ -255,8 +245,7 @@ class CodeController extends TextEditingController {
   }
 
   @override
-  TextSpan buildTextSpan(
-      {required BuildContext context, TextStyle? style, bool? withComposing}) {
+  TextSpan buildTextSpan({required BuildContext context, TextStyle? style, bool? withComposing}) {
     // Retrieve pattern regexp
     final patternList = <String>[];
     if (_webSpaceFix) {
