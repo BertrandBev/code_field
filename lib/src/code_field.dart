@@ -57,6 +57,9 @@ class LineNumberStyle {
 
 class CodeField extends StatefulWidget {
   /// {@macro flutter.widgets.textField.minLines}
+  final SmartQuotesType smartQuotesType;
+
+  /// {@macro flutter.widgets.textField.minLines}
   final int? minLines;
 
   /// {@macro flutter.widgets.textField.maxLInes}
@@ -117,6 +120,7 @@ class CodeField extends StatefulWidget {
     this.lineNumberBuilder,
     this.focusNode,
     this.onChanged,
+    this.smartQuotesType = SmartQuotesType.enabled,
   }) : super(key: key);
 
   @override
@@ -248,6 +252,7 @@ class CodeFieldState extends State<CodeField> {
         widget.cursorColor ?? theme?[ROOT_KEY]?.color ?? defaultText;
 
     final lineNumberCol = TextField(
+      smartQuotesType: widget.smartQuotesType,
       scrollPadding: widget.padding,
       style: numberTextStyle,
       controller: _numberController,
@@ -273,6 +278,7 @@ class CodeFieldState extends State<CodeField> {
     );
 
     final codeField = TextField(
+      smartQuotesType: widget.smartQuotesType,
       focusNode: _focusNode,
       scrollPadding: widget.padding,
       style: textStyle,
