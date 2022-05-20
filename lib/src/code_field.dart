@@ -2,9 +2,8 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
+
 import './code_controller.dart';
 
 class LineNumberController extends TextEditingController {
@@ -278,6 +277,7 @@ class CodeFieldState extends State<CodeField> {
     );
 
     final codeField = TextField(
+      keyboardType: TextInputType.visiblePassword,
       smartQuotesType: widget.smartQuotesType,
       focusNode: _focusNode,
       scrollPadding: widget.padding,
