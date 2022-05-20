@@ -2,9 +2,8 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
+
 import './code_controller.dart';
 
 class LineNumberController extends TextEditingController {
@@ -56,6 +55,9 @@ class LineNumberStyle {
 }
 
 class CodeField extends StatefulWidget {
+  /// {@macro flutter.widgets.textField.minLines}
+  final SmartQuotesType smartQuotesType;
+
   /// {@macro flutter.widgets.textField.minLines}
   final int? minLines;
 
@@ -117,6 +119,7 @@ class CodeField extends StatefulWidget {
     this.lineNumberBuilder,
     this.focusNode,
     this.onChanged,
+    this.smartQuotesType = SmartQuotesType.enabled,
   }) : super(key: key);
 
   @override
@@ -248,6 +251,7 @@ class CodeFieldState extends State<CodeField> {
         widget.cursorColor ?? theme?[ROOT_KEY]?.color ?? defaultText;
 
     final lineNumberCol = TextField(
+      smartQuotesType: widget.smartQuotesType,
       scrollPadding: widget.padding,
       style: numberTextStyle,
       controller: _numberController,
@@ -273,6 +277,8 @@ class CodeFieldState extends State<CodeField> {
     );
 
     final codeField = TextField(
+      keyboardType: TextInputType.visiblePassword,
+      smartQuotesType: widget.smartQuotesType,
       focusNode: _focusNode,
       scrollPadding: widget.padding,
       style: textStyle,
