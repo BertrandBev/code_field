@@ -12,16 +12,14 @@ class LineNumberController extends TextEditingController {
   LineNumberController(this.lineNumberBuilder);
 
   @override
-  TextSpan buildTextSpan(
-      {required BuildContext context, TextStyle? style, bool? withComposing}) {
+  TextSpan buildTextSpan({required BuildContext context, TextStyle? style, bool? withComposing}) {
     final children = <TextSpan>[];
     final list = text.split("\n");
     for (int k = 0; k < list.length; k++) {
       final el = list[k];
       final number = int.parse(el);
       var textSpan = TextSpan(text: el, style: style);
-      if (lineNumberBuilder != null)
-        textSpan = lineNumberBuilder!(number, style);
+      if (lineNumberBuilder != null) textSpan = lineNumberBuilder!(number, style);
       children.add(textSpan);
       if (k < list.length - 1) children.add(TextSpan(text: "\n"));
     }
@@ -99,6 +97,7 @@ class CodeField extends StatefulWidget {
   final Decoration? decoration;
   final TextSelectionThemeData? textSelectionTheme;
   final FocusNode? focusNode;
+  final void Function()? onTap;
 
   const CodeField({
     Key? key,
@@ -113,6 +112,7 @@ class CodeField extends StatefulWidget {
     this.padding = const EdgeInsets.symmetric(),
     this.lineNumberStyle = const LineNumberStyle(),
     this.enabled,
+    this.onTap,
     this.readOnly = false,
     this.cursorColor,
     this.textSelectionTheme,
@@ -127,12 +127,12 @@ class CodeField extends StatefulWidget {
 }
 
 class CodeFieldState extends State<CodeField> {
-// Add a controller
+  // Add a controller
   LinkedScrollControllerGroup? _controllers;
   ScrollController? _numberScroll;
   ScrollController? _codeScroll;
   LineNumberController? _numberController;
-  //
+
   StreamSubscription<bool>? _keyboardVisibilitySubscription;
   FocusNode? _focusNode;
   String? lines;
@@ -147,12 +147,14 @@ class CodeFieldState extends State<CodeField> {
     _numberController = LineNumberController(widget.lineNumberBuilder);
     widget.controller.addListener(_onTextChanged);
     _focusNode = widget.focusNode ?? FocusNode();
+    _focusNode!.onKey = _onKey;
     _focusNode!.attach(context, onKey: _onKey);
 
     _onTextChanged();
   }
 
   KeyEventResult _onKey(FocusNode node, RawKeyEvent event) {
+    if (widget.readOnly) return KeyEventResult.ignored;
     return widget.controller.onKey(event);
   }
 
@@ -187,8 +189,7 @@ class CodeFieldState extends State<CodeField> {
   }
 
   // Wrap the codeField in a horizontal scrollView
-  Widget _wrapInScrollView(
-      Widget codeField, TextStyle textStyle, double minWidth) {
+  Widget _wrapInScrollView(Widget codeField, TextStyle textStyle, double minWidth) {
     final leftPad = widget.lineNumberStyle.margin / 2;
     final intrinsic = IntrinsicWidth(
       child: Column(
@@ -228,8 +229,7 @@ class CodeFieldState extends State<CodeField> {
     final defaultText = Colors.grey.shade200;
 
     final theme = widget.controller.theme;
-    Color? backgroundCol =
-        widget.background ?? theme?[ROOT_KEY]?.backgroundColor ?? defaultBg;
+    Color? backgroundCol = widget.background ?? theme?[ROOT_KEY]?.backgroundColor ?? defaultBg;
     if (widget.decoration != null) {
       backgroundCol = null;
     }
@@ -239,16 +239,14 @@ class CodeFieldState extends State<CodeField> {
       fontSize: textStyle.fontSize ?? 16.0,
     );
     TextStyle numberTextStyle = widget.lineNumberStyle.textStyle ?? TextStyle();
-    final numberColor =
-        (theme?[ROOT_KEY]?.color ?? defaultText).withOpacity(0.7);
+    final numberColor = (theme?[ROOT_KEY]?.color ?? defaultText).withOpacity(0.7);
     // Copy important attributes
     numberTextStyle = numberTextStyle.copyWith(
       color: numberTextStyle.color ?? numberColor,
       fontSize: textStyle.fontSize,
       fontFamily: textStyle.fontFamily,
     );
-    final cursorColor =
-        widget.cursorColor ?? theme?[ROOT_KEY]?.color ?? defaultText;
+    final cursorColor = widget.cursorColor ?? theme?[ROOT_KEY]?.color ?? defaultText;
 
     final lineNumberCol = TextField(
       smartQuotesType: widget.smartQuotesType,
@@ -280,6 +278,7 @@ class CodeFieldState extends State<CodeField> {
       keyboardType: TextInputType.visiblePassword,
       smartQuotesType: widget.smartQuotesType,
       focusNode: _focusNode,
+      onTap: widget.onTap,
       scrollPadding: widget.padding,
       style: textStyle,
       controller: widget.controller,
@@ -307,9 +306,7 @@ class CodeFieldState extends State<CodeField> {
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           // Control horizontal scrolling
-          return widget.wrap
-              ? codeField
-              : _wrapInScrollView(codeField, textStyle, constraints.maxWidth);
+          return widget.wrap ? codeField : _wrapInScrollView(codeField, textStyle, constraints.maxWidth);
         },
       ),
     );

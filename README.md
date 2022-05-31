@@ -11,7 +11,7 @@ A customizable code text field supporting syntax highlighting
 
 ## Live demo
 
-A [live demo](https://bertrandbev.github.io/code_field/#/) showcasing a few language / themes combinaisons 
+A [live demo](https://bertrandbev.github.io/code_field/#/) showcasing a few language / theme combinations 
 
 ## Showcase
 
@@ -199,6 +199,7 @@ Key? key,
   this.textSelectionTheme,
   this.lineNumberBuilder,
   this.focusNode,
+  this.onTap,
 })
 ```
 
