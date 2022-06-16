@@ -14,11 +14,38 @@ class EditorParams {
 }
 
 class CodeController extends TextEditingController {
+  Mode? _language;
+
   /// A highlight language to parse the text with
-  final Mode? language;
+  Mode? get language => _language;
+
+  set language(Mode? language) {
+    if (language == _language) {
+      return;
+    }
+
+    if (language != null) {
+      _languageId = _genId();
+      highlight.registerLanguage(_languageId, language);
+    }
+
+    _language = language;
+    notifyListeners();
+  }
+
+  Map<String, TextStyle>? _theme;
 
   /// The theme to apply to the [language] parsing result
-  final Map<String, TextStyle>? theme;
+  Map<String, TextStyle>? get theme => _theme;
+
+  set theme(Map<String, TextStyle>? theme) {
+    if (theme == _theme) {
+      return;
+    }
+
+    _theme = theme;
+    notifyListeners();
+  }
 
   /// A map of specific regexes to style
   final Map<String, TextStyle>? patternMap;
@@ -43,15 +70,18 @@ class CodeController extends TextEditingController {
   final void Function(String)? onChange;
 
   /* Computed members */
-  final String languageId = _genId();
+  String _languageId = _genId();
+
+  String get languageId => _languageId;
+
   final styleList = <TextStyle>[];
   final modifierMap = <String, CodeModifier>{};
   RegExp? styleRegExp;
 
   CodeController({
     String? text,
-    this.language,
-    this.theme,
+    Mode? language,
+    Map<String, TextStyle>? theme,
     this.patternMap,
     this.stringMap,
     this.params = const EditorParams(),
@@ -62,13 +92,10 @@ class CodeController extends TextEditingController {
     ],
     this.webSpaceFix = true,
     this.onChange,
-  }) : super(text: text) {
-    // PatternMap
-    if (language != null && theme == null) throw Exception("A theme must be provided for language parsing");
-    // Register language
-    if (language != null) {
-      highlight.registerLanguage(languageId, language!);
-    }
+  })  : _theme = theme,
+        super(text: text) {
+    this.language = language;
+
     // Create modifier map
     modifiers.forEach((el) {
       modifierMap[el.char] = el;
@@ -207,7 +234,7 @@ class CodeController extends TextEditingController {
 
   TextSpan _processLanguage(String text, TextStyle? style) {
     final rawText = _webSpaceFix ? _middleDotsToSpaces(text) : text;
-    final result = highlight.parse(rawText, language: languageId);
+    final result = highlight.parse(rawText, language: _languageId);
 
     final nodes = result.nodes;
 
@@ -220,14 +247,14 @@ class CodeController extends TextEditingController {
       final nodeChildren = node.children;
       if (val != null) {
         if (_webSpaceFix) val = _spacesToMiddleDots(val);
-        var child = TextSpan(text: val, style: theme?[node.className]);
-        if (styleRegExp != null) child = _processPatterns(val, theme?[node.className]);
+        var child = TextSpan(text: val, style: _theme?[node.className]);
+        if (styleRegExp != null) child = _processPatterns(val, _theme?[node.className]);
         currentSpans.add(child);
       } else if (nodeChildren != null) {
         List<TextSpan> tmp = [];
         currentSpans.add(TextSpan(
           children: tmp,
-          style: theme?[node.className],
+          style: _theme?[node.className],
         ));
         stack.add(currentSpans);
         currentSpans = tmp;
@@ -263,7 +290,7 @@ class CodeController extends TextEditingController {
     styleRegExp = RegExp(patternList.join('|'), multiLine: true);
 
     // Return parsing
-    if (language != null)
+    if (_language != null && _theme != null)
       return _processLanguage(text, style);
     else if (styleRegExp != null)
       return _processPatterns(text, style);
