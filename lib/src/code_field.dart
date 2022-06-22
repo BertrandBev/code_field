@@ -53,8 +53,11 @@ class LineNumberStyle {
 }
 
 class CodeField extends StatefulWidget {
-  /// {@macro flutter.widgets.textField.minLines}
-  final SmartQuotesType smartQuotesType;
+  /// {@macro flutter.widgets.textField.smartQuotesType}
+  final SmartQuotesType? smartQuotesType;
+
+  /// {@macro flutter.widgets.textField.keyboardType}
+  final TextInputType? keyboardType;
 
   /// {@macro flutter.widgets.textField.minLines}
   final int? minLines;
@@ -122,7 +125,8 @@ class CodeField extends StatefulWidget {
     this.focusNode,
     this.onChanged,
     this.isDense = false,
-    this.smartQuotesType = SmartQuotesType.enabled,
+    this.smartQuotesType,
+    this.keyboardType,
   }) : super(key: key);
 
   @override
@@ -279,7 +283,7 @@ class CodeFieldState extends State<CodeField> {
     );
 
     final codeField = TextField(
-      keyboardType: TextInputType.visiblePassword,
+      keyboardType: widget.keyboardType,
       smartQuotesType: widget.smartQuotesType,
       focusNode: _focusNode,
       onTap: widget.onTap,
