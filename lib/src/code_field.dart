@@ -92,6 +92,8 @@ class CodeField extends StatefulWidget {
   /// {@macro flutter.widgets.editableText.readOnly}
   final bool readOnly;
 
+  final bool isDense;
+
   final Color? background;
   final EdgeInsets padding;
   final Decoration? decoration;
@@ -119,6 +121,7 @@ class CodeField extends StatefulWidget {
     this.lineNumberBuilder,
     this.focusNode,
     this.onChanged,
+    this.isDense = false,
     this.smartQuotesType = SmartQuotesType.enabled,
   }) : super(key: key);
 
@@ -260,6 +263,7 @@ class CodeFieldState extends State<CodeField> {
       scrollController: _numberScroll,
       decoration: InputDecoration(
         disabledBorder: InputBorder.none,
+        isDense: widget.isDense,
       ),
       textAlign: widget.lineNumberStyle.textAlign,
     );
@@ -290,6 +294,7 @@ class CodeFieldState extends State<CodeField> {
         disabledBorder: InputBorder.none,
         border: InputBorder.none,
         focusedBorder: InputBorder.none,
+        isDense: widget.isDense,
       ),
       cursorColor: cursorColor,
       autocorrect: false,
@@ -310,6 +315,7 @@ class CodeFieldState extends State<CodeField> {
         },
       ),
     );
+
     return Container(
       decoration: widget.decoration,
       color: backgroundCol,
