@@ -275,7 +275,6 @@ class CodeFieldState extends State<CodeField> {
     );
 
     final codeField = TextField(
-      keyboardType: TextInputType.visiblePassword,
       smartQuotesType: widget.smartQuotesType,
       focusNode: _focusNode,
       onTap: widget.onTap,
