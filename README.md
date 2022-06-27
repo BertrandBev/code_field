@@ -218,8 +218,8 @@ LineNumberStyle({
 ```dart
 CodeController({
   String? text,
-  this.language,
-  this.theme,
+  Mode? language,
+  Map<String, TextStyle>? theme,
   this.patternMap,
   this.stringMap,
   this.params = const EditorParams(),
