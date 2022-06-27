@@ -1,9 +1,12 @@
 import 'dart:math';
-import 'package:code_text_field/src/code_modifier.dart';
+
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:highlight/highlight_core.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+
+import 'code_modifier.dart';
+import 'theme.dart';
 
 const _MIDDLE_DOT = '·';
 
@@ -36,8 +39,10 @@ class CodeController extends TextEditingController {
   Map<String, TextStyle>? _theme;
 
   /// The theme to apply to the [language] parsing result
+  @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
   Map<String, TextStyle>? get theme => _theme;
 
+  @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
   set theme(Map<String, TextStyle>? theme) {
     if (theme == _theme) {
       return;
@@ -232,7 +237,7 @@ class CodeController extends TextEditingController {
     return TextSpan(style: style, children: children);
   }
 
-  TextSpan _processLanguage(String text, TextStyle? style) {
+  TextSpan _processLanguage(String text, CodeThemeData? widgetTheme, TextStyle? style) {
     final rawText = _webSpaceFix ? _middleDotsToSpaces(text) : text;
     final result = highlight.parse(rawText, language: _languageId);
 
@@ -245,16 +250,18 @@ class CodeController extends TextEditingController {
     void _traverse(Node node) {
       var val = node.value;
       final nodeChildren = node.children;
+      final nodeStyle = widgetTheme?.styles[node.className] ?? _theme?[node.className];
+
       if (val != null) {
         if (_webSpaceFix) val = _spacesToMiddleDots(val);
-        var child = TextSpan(text: val, style: _theme?[node.className]);
-        if (styleRegExp != null) child = _processPatterns(val, _theme?[node.className]);
+        var child = TextSpan(text: val, style: nodeStyle);
+        if (styleRegExp != null) child = _processPatterns(val, nodeStyle);
         currentSpans.add(child);
       } else if (nodeChildren != null) {
         List<TextSpan> tmp = [];
         currentSpans.add(TextSpan(
           children: tmp,
-          style: _theme?[node.className],
+          style: nodeStyle,
         ));
         stack.add(currentSpans);
         currentSpans = tmp;
@@ -290,11 +297,14 @@ class CodeController extends TextEditingController {
     styleRegExp = RegExp(patternList.join('|'), multiLine: true);
 
     // Return parsing
-    if (_language != null && _theme != null)
-      return _processLanguage(text, style);
-    else if (styleRegExp != null)
+    if (_language != null) {
+      return _processLanguage(text, CodeTheme.of(context), style);
+    }
+
+    if (styleRegExp != null) {
       return _processPatterns(text, style);
-    else
-      return TextSpan(text: text, style: style);
+    }
+
+    return TextSpan(text: text, style: style);
   }
 }

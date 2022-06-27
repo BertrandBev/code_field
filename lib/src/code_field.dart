@@ -4,7 +4,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
-import './code_controller.dart';
+import 'code_controller.dart';
+import 'theme.dart';
 
 class LineNumberController extends TextEditingController {
   final TextSpan Function(int, TextStyle?)? lineNumberBuilder;
@@ -228,25 +229,25 @@ class CodeFieldState extends State<CodeField> {
     final defaultBg = Colors.grey.shade900;
     final defaultText = Colors.grey.shade200;
 
-    final theme = widget.controller.theme;
-    Color? backgroundCol = widget.background ?? theme?[ROOT_KEY]?.backgroundColor ?? defaultBg;
+    final styles = CodeTheme.of(context)?.styles;
+    Color? backgroundCol = widget.background ?? styles?[ROOT_KEY]?.backgroundColor ?? defaultBg;
     if (widget.decoration != null) {
       backgroundCol = null;
     }
     TextStyle textStyle = widget.textStyle ?? TextStyle();
     textStyle = textStyle.copyWith(
-      color: textStyle.color ?? theme?[ROOT_KEY]?.color ?? defaultText,
+      color: textStyle.color ?? styles?[ROOT_KEY]?.color ?? defaultText,
       fontSize: textStyle.fontSize ?? 16.0,
     );
     TextStyle numberTextStyle = widget.lineNumberStyle.textStyle ?? TextStyle();
-    final numberColor = (theme?[ROOT_KEY]?.color ?? defaultText).withOpacity(0.7);
+    final numberColor = (styles?[ROOT_KEY]?.color ?? defaultText).withOpacity(0.7);
     // Copy important attributes
     numberTextStyle = numberTextStyle.copyWith(
       color: numberTextStyle.color ?? numberColor,
       fontSize: textStyle.fontSize,
       fontFamily: textStyle.fontFamily,
     );
-    final cursorColor = widget.cursorColor ?? theme?[ROOT_KEY]?.color ?? defaultText;
+    final cursorColor = widget.cursorColor ?? styles?[ROOT_KEY]?.color ?? defaultText;
 
     final lineNumberCol = TextField(
       smartQuotesType: widget.smartQuotesType,
