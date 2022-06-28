@@ -25,7 +25,6 @@ class _CodeEditorState extends State<CodeEditor> {
     _codeController = CodeController(
       text: source,
       language: dart,
-      theme: monokaiSublimeTheme,
     );
   }
 
@@ -37,10 +36,13 @@ class _CodeEditorState extends State<CodeEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return CodeField(
-      controller: _codeController!,
-      textStyle: TextStyle(fontFamily: 'SourceCode'),
-      expands: true,
+    return CodeTheme(
+      data: CodeThemeData(styles: monokaiSublimeTheme),
+      child: CodeField(
+        controller: _codeController!,
+        textStyle: TextStyle(fontFamily: 'SourceCode'),
+        expands: true,
+      ),
     );
   }
 }
@@ -61,7 +63,6 @@ class _CodeEditor1State extends State<CodeEditor1> {
     _codeController = CodeController(
       text: source,
       language: dart,
-      theme: monokaiSublimeTheme,
     );
   }
 
@@ -73,9 +74,12 @@ class _CodeEditor1State extends State<CodeEditor1> {
 
   @override
   Widget build(BuildContext context) {
-    return CodeField(
-      controller: _codeController!,
-      textStyle: TextStyle(fontFamily: 'SourceCode'),
+    return CodeTheme(
+      data: CodeThemeData(styles: monokaiSublimeTheme),
+      child: CodeField(
+        controller: _codeController!,
+        textStyle: TextStyle(fontFamily: 'SourceCode'),
+      ),
     );
   }
 }
@@ -100,7 +104,6 @@ class _CodeEditor2State extends State<CodeEditor2> {
     _codeController = CodeController(
       text: source,
       language: dart,
-      theme: monokaiSublimeTheme,
       stringMap: {
         "Hello": TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
         "world": TextStyle(fontStyle: FontStyle.italic, color: Colors.green),
@@ -116,9 +119,12 @@ class _CodeEditor2State extends State<CodeEditor2> {
 
   @override
   Widget build(BuildContext context) {
-    return CodeField(
-      controller: _codeController!,
-      textStyle: TextStyle(fontFamily: 'SourceCode'),
+    return CodeTheme(
+      data: CodeThemeData(styles: monokaiSublimeTheme),
+      child: CodeField(
+        controller: _codeController!,
+        textStyle: TextStyle(fontFamily: 'SourceCode'),
+      ),
     );
   }
 }
@@ -143,7 +149,6 @@ class _CodeEditor3State extends State<CodeEditor3> {
     _codeController = CodeController(
       text: source,
       language: dart,
-      theme: monokaiSublimeTheme,
       patternMap: {
         r"\B#[a-zA-Z0-9]+\b":
             TextStyle(fontWeight: FontWeight.bold, color: Colors.purpleAccent),
@@ -159,9 +164,12 @@ class _CodeEditor3State extends State<CodeEditor3> {
 
   @override
   Widget build(BuildContext context) {
-    return CodeField(
-      controller: _codeController!,
-      textStyle: TextStyle(fontFamily: 'SourceCode'),
+    return CodeTheme(
+      data: CodeThemeData(styles: monokaiSublimeTheme),
+      child: CodeField(
+        controller: _codeController!,
+        textStyle: TextStyle(fontFamily: 'SourceCode'),
+      ),
     );
   }
 }
@@ -251,7 +259,6 @@ void main() {
     _codeController = CodeController(
       text: source,
       language: dart,
-      theme: a11yDarkTheme,
     );
   }
 
@@ -263,10 +270,13 @@ void main() {
 
   @override
   Widget build(BuildContext context) {
-    return CodeField(
-      controller: _codeController!,
-      textStyle: TextStyle(fontFamily: 'SourceCode'),
-      expands: true,
+    return CodeTheme(
+      data: CodeThemeData(styles: a11yDarkTheme),
+      child: CodeField(
+        controller: _codeController!,
+        textStyle: TextStyle(fontFamily: 'SourceCode'),
+        expands: true,
+      ),
     );
   }
 }

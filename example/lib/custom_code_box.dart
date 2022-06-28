@@ -140,7 +140,6 @@ class _InnerFieldState extends State<InnerField> {
         "bev": TextStyle(color: Colors.indigo),
       },
       language: allLanguages[widget.language],
-      theme: THEMES[widget.theme],
     );
   }
 
@@ -152,6 +151,19 @@ class _InnerFieldState extends State<InnerField> {
 
   @override
   Widget build(BuildContext context) {
+    final styles = THEMES[widget.theme];
+
+    if (styles == null) {
+      return _buildCodeField();
+    }
+
+    return CodeTheme(
+      data: CodeThemeData(styles: styles),
+      child: _buildCodeField(),
+    );
+  }
+
+  Widget _buildCodeField() {
     return CodeField(
       controller: _codeController!,
       textStyle: TextStyle(fontFamily: 'SourceCode'),
