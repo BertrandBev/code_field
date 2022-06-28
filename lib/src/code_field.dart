@@ -53,8 +53,11 @@ class LineNumberStyle {
 }
 
 class CodeField extends StatefulWidget {
-  /// {@macro flutter.widgets.textField.minLines}
-  final SmartQuotesType smartQuotesType;
+  /// {@macro flutter.widgets.textField.smartQuotesType}
+  final SmartQuotesType? smartQuotesType;
+
+  /// {@macro flutter.widgets.textField.keyboardType}
+  final TextInputType? keyboardType;
 
   /// {@macro flutter.widgets.textField.minLines}
   final int? minLines;
@@ -92,12 +95,17 @@ class CodeField extends StatefulWidget {
   /// {@macro flutter.widgets.editableText.readOnly}
   final bool readOnly;
 
+  /// {@macro flutter.widgets.textField.isDense}
+  final bool isDense;
+
   final Color? background;
   final EdgeInsets padding;
   final Decoration? decoration;
   final TextSelectionThemeData? textSelectionTheme;
   final FocusNode? focusNode;
   final void Function()? onTap;
+  final bool lineNumbers;
+  final bool horizontalScroll;
 
   const CodeField({
     Key? key,
@@ -119,7 +127,11 @@ class CodeField extends StatefulWidget {
     this.lineNumberBuilder,
     this.focusNode,
     this.onChanged,
-    this.smartQuotesType = SmartQuotesType.enabled,
+    this.isDense = false,
+    this.smartQuotesType,
+    this.keyboardType,
+    this.lineNumbers = true,
+    this.horizontalScroll = true,
   }) : super(key: key);
 
   @override
@@ -217,6 +229,9 @@ class CodeFieldState extends State<CodeField> {
         right: widget.padding.right,
       ),
       scrollDirection: Axis.horizontal,
+
+      /// Prevents the horizontal scroll if horizontalScroll is false
+      physics: widget.horizontalScroll ? null : NeverScrollableScrollPhysics(),
       child: intrinsic,
     );
   }
@@ -248,33 +263,39 @@ class CodeFieldState extends State<CodeField> {
     );
     final cursorColor = widget.cursorColor ?? theme?[ROOT_KEY]?.color ?? defaultText;
 
-    final lineNumberCol = TextField(
-      smartQuotesType: widget.smartQuotesType,
-      scrollPadding: widget.padding,
-      style: numberTextStyle,
-      controller: _numberController,
-      enabled: false,
-      minLines: widget.minLines,
-      maxLines: widget.maxLines,
-      expands: widget.expands,
-      scrollController: _numberScroll,
-      decoration: InputDecoration(
-        disabledBorder: InputBorder.none,
-      ),
-      textAlign: widget.lineNumberStyle.textAlign,
-    );
+    TextField? lineNumberCol;
+    Container? numberCol;
+    if (widget.lineNumbers) {
+      lineNumberCol = TextField(
+        smartQuotesType: widget.smartQuotesType,
+        scrollPadding: widget.padding,
+        style: numberTextStyle,
+        controller: _numberController,
+        enabled: false,
+        minLines: widget.minLines,
+        maxLines: widget.maxLines,
+        expands: widget.expands,
+        scrollController: _numberScroll,
+        decoration: InputDecoration(
+          disabledBorder: InputBorder.none,
+          isDense: widget.isDense,
+        ),
+        textAlign: widget.lineNumberStyle.textAlign,
+      );
 
-    final numberCol = Container(
-      width: widget.lineNumberStyle.width,
-      padding: EdgeInsets.only(
-        left: widget.padding.left,
-        right: widget.lineNumberStyle.margin / 2,
-      ),
-      color: widget.lineNumberStyle.background,
-      child: lineNumberCol,
-    );
+      numberCol = Container(
+        width: widget.lineNumberStyle.width,
+        padding: EdgeInsets.only(
+          left: widget.padding.left,
+          right: widget.lineNumberStyle.margin / 2,
+        ),
+        color: widget.lineNumberStyle.background,
+        child: lineNumberCol,
+      );
+    }
 
     final codeField = TextField(
+      keyboardType: widget.keyboardType,
       smartQuotesType: widget.smartQuotesType,
       focusNode: _focusNode,
       onTap: widget.onTap,
@@ -289,6 +310,7 @@ class CodeFieldState extends State<CodeField> {
         disabledBorder: InputBorder.none,
         border: InputBorder.none,
         focusedBorder: InputBorder.none,
+        isDense: widget.isDense,
       ),
       cursorColor: cursorColor,
       autocorrect: false,
@@ -309,13 +331,15 @@ class CodeFieldState extends State<CodeField> {
         },
       ),
     );
+
     return Container(
       decoration: widget.decoration,
       color: backgroundCol,
+      padding: !widget.lineNumbers ? EdgeInsets.only(left: 8) : null,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          numberCol,
+          if (widget.lineNumbers && numberCol != null) numberCol,
           Expanded(child: codeCol),
         ],
       ),

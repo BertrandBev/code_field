@@ -44,3 +44,11 @@
 * added onTap to CodeField API
 * fixed tab behavior in read-only mode
 * added setCursor method to CodeController
+
+## [1.0.4] - 2022-06-22
+
+* added isDense to CodeField API as optional parameter
+* added smartQuotesType to CodeField API as optional parameter
+* added keyboardType to CodeField API as optional parameter
+* solves 'enter' linebreak bug
+* adds a macos desktop example app
