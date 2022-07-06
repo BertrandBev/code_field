@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:highlight/highlight_core.dart';
 
-import '../code_modifiers/code_block_modifier.dart';
+import '../code_modifiers/close_block_code_modifier.dart';
 import '../code_modifiers/code_modifier.dart';
 import '../code_modifiers/indent_code_modifier.dart';
 import '../code_modifiers/tab_code_modifier.dart';

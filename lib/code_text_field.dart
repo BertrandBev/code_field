@@ -2,7 +2,7 @@ export 'src/code_field/code_controller.dart';
 export 'src/code_field/code_field.dart';
 export 'src/code_field/editor_params.dart';
 
-export 'src/code_modifiers/code_block_modifier.dart';
+export 'src/code_modifiers/close_block_code_modifier.dart';
 export 'src/code_modifiers/code_modifier.dart';
 export 'src/code_modifiers/indent_code_modifier.dart';
 export 'src/code_modifiers/tab_code_modifier.dart';
