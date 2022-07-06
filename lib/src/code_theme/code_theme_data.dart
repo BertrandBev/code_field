@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 class CodeThemeData {
   final Map<String, TextStyle> styles;
 
-  CodeThemeData({
+  const CodeThemeData({
     required this.styles,
   });
 
