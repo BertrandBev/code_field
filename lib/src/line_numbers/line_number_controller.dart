@@ -13,8 +13,8 @@ class LineNumberController extends TextEditingController {
     TextStyle? style,
     bool? withComposing,
   }) {
-    final children = <TextSpan>[];
-    final list = text.split("\n");
+    final children = <InlineSpan>[];
+    final list = text.split('\n');
 
     for (int k = 0; k < list.length; k++) {
       final el = list[k];
@@ -27,7 +27,7 @@ class LineNumberController extends TextEditingController {
 
       children.add(textSpan);
       if (k < list.length - 1) {
-        children.add(TextSpan(text: "\n"));
+        children.add(const TextSpan(text: '\n'));
       }
     }
 
