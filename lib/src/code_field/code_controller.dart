@@ -5,16 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:highlight/highlight_core.dart';
 
-import 'code_modifier.dart';
-import 'theme.dart';
+import '../code_modifiers/close_block_code_modifier.dart';
+import '../code_modifiers/code_modifier.dart';
+import '../code_modifiers/indent_code_modifier.dart';
+import '../code_modifiers/tab_code_modifier.dart';
+import '../code_theme/code_theme.dart';
+import '../code_theme/code_theme_data.dart';
+import 'editor_params.dart';
 
 const _MIDDLE_DOT = '·';
-
-class EditorParams {
-  final int tabSpaces;
-
-  const EditorParams({this.tabSpaces = 2});
-}
 
 class CodeController extends TextEditingController {
   Mode? _language;
@@ -86,7 +85,8 @@ class CodeController extends TextEditingController {
   CodeController({
     String? text,
     Mode? language,
-    Map<String, TextStyle>? theme,
+    @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
+        Map<String, TextStyle>? theme,
     this.patternMap,
     this.stringMap,
     this.params = const EditorParams(),
@@ -117,6 +117,7 @@ class CodeController extends TextEditingController {
     final sel = selection;
     text = text.replaceRange(selection.start, selection.end, str);
     final len = str.length;
+
     selection = sel.copyWith(
       baseOffset: sel.start + len,
       extentOffset: sel.start + len,
@@ -125,9 +126,13 @@ class CodeController extends TextEditingController {
 
   /// Remove the char just before the cursor or the selection
   void removeChar() {
-    if (selection.start < 1) return;
+    if (selection.start < 1) {
+      return;
+    }
+
     final sel = selection;
     text = text.replaceRange(selection.start - 1, selection.start, "");
+
     selection = sel.copyWith(
       baseOffset: sel.start - 1,
       extentOffset: sel.start - 1,
@@ -138,6 +143,7 @@ class CodeController extends TextEditingController {
   void removeSelection() {
     final sel = selection;
     text = text.replaceRange(selection.start, selection.end, "");
+
     selection = sel.copyWith(
       baseOffset: sel.start,
       extentOffset: sel.start,
@@ -146,10 +152,11 @@ class CodeController extends TextEditingController {
 
   /// Remove the selection or last char if the selection is empty
   void backspace() {
-    if (selection.start < selection.end)
+    if (selection.start < selection.end) {
       removeSelection();
-    else
+    } else {
       removeChar();
+    }
   }
 
   KeyEventResult onKey(RawKeyEvent event) {
@@ -157,6 +164,7 @@ class CodeController extends TextEditingController {
       text = text.replaceRange(selection.start, selection.end, "\t");
       return KeyEventResult.handled;
     }
+
     return KeyEventResult.ignored;
   }
 
@@ -173,7 +181,10 @@ class CodeController extends TextEditingController {
   /// Get untransformed text
   /// See webSpaceFix
   String get rawText {
-    if (!_webSpaceFix) return super.text;
+    if (!_webSpaceFix) {
+      return super.text;
+    }
+
     return _middleDotsToSpaces(super.text);
   }
 
@@ -183,24 +194,34 @@ class CodeController extends TextEditingController {
   static String _genId() {
     const _chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
     final _rnd = Random();
+
     return String.fromCharCodes(
-      Iterable.generate(10, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))),
+      Iterable.generate(
+        10,
+        (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length)),
+      ),
     );
   }
 
   int? _insertedLoc(String a, String b) {
     final sel = selection;
-    if (a.length + 1 != b.length || sel.start != sel.end) return null;
+
+    if (a.length + 1 != b.length || sel.start != sel.end) {
+      return null;
+    }
+
     return sel.start;
   }
 
   @override
   set value(TextEditingValue newValue) {
     final loc = _insertedLoc(text, newValue.text);
+
     if (loc != null) {
       final char = newValue.text[loc];
       final modifier = modifierMap[char];
       final val = modifier?.updateString(rawText, selection, params);
+
       if (val != null) {
         // Update newValue
         newValue = newValue.copyWith(
@@ -209,20 +230,38 @@ class CodeController extends TextEditingController {
         );
       }
     }
+
     // Now fix the textfield for web
-    if (_webSpaceFix) newValue = newValue.copyWith(text: _spacesToMiddleDots(newValue.text));
-    if (onChange != null) onChange!(_webSpaceFix ? _middleDotsToSpaces(newValue.text) : newValue.text);
+    if (_webSpaceFix) {
+      newValue = newValue.copyWith(text: _spacesToMiddleDots(newValue.text));
+    }
+
+    if (onChange != null) {
+      onChange!(
+        _webSpaceFix ? _middleDotsToSpaces(newValue.text) : newValue.text,
+      );
+    }
+
     super.value = newValue;
   }
 
   TextSpan _processPatterns(String text, TextStyle? style) {
     final children = <TextSpan>[];
+
     text.splitMapJoin(
       styleRegExp!,
       onMatch: (Match m) {
-        if (styleList.isEmpty) return '';
+        if (styleList.isEmpty) {
+          return '';
+        }
+
         int idx;
-        for (idx = 1; idx < m.groupCount && idx <= styleList.length && m.group(idx) == null; idx++) {}
+        for (idx = 1;
+            idx < m.groupCount &&
+                idx <= styleList.length &&
+                m.group(idx) == null;
+            idx++) {}
+
         children.add(TextSpan(
           text: m[0],
           style: styleList[idx - 1],
@@ -234,10 +273,15 @@ class CodeController extends TextEditingController {
         return '';
       },
     );
+
     return TextSpan(style: style, children: children);
   }
 
-  TextSpan _processLanguage(String text, CodeThemeData? widgetTheme, TextStyle? style) {
+  TextSpan _processLanguage(
+    String text,
+    CodeThemeData? widgetTheme,
+    TextStyle? style,
+  ) {
     final rawText = _webSpaceFix ? _middleDotsToSpaces(text) : text;
     final result = highlight.parse(rawText, language: _languageId);
 
@@ -250,21 +294,32 @@ class CodeController extends TextEditingController {
     void _traverse(Node node) {
       var val = node.value;
       final nodeChildren = node.children;
-      final nodeStyle = widgetTheme?.styles[node.className] ?? _theme?[node.className];
+      final nodeStyle =
+          widgetTheme?.styles[node.className] ?? _theme?[node.className];
 
       if (val != null) {
-        if (_webSpaceFix) val = _spacesToMiddleDots(val);
+        if (_webSpaceFix) {
+          val = _spacesToMiddleDots(val);
+        }
+
         var child = TextSpan(text: val, style: nodeStyle);
-        if (styleRegExp != null) child = _processPatterns(val, nodeStyle);
+
+        if (styleRegExp != null) {
+          child = _processPatterns(val, nodeStyle);
+        }
+
         currentSpans.add(child);
       } else if (nodeChildren != null) {
         List<TextSpan> tmp = [];
+
         currentSpans.add(TextSpan(
           children: tmp,
           style: nodeStyle,
         ));
+
         stack.add(currentSpans);
         currentSpans = tmp;
+
         nodeChildren.forEach((n) {
           _traverse(n);
           if (n == nodeChildren.last) {
@@ -274,26 +329,39 @@ class CodeController extends TextEditingController {
       }
     }
 
-    if (nodes != null) for (var node in nodes) _traverse(node);
+    if (nodes != null) {
+      for (var node in nodes) {
+        _traverse(node);
+      }
+    }
+
     return TextSpan(style: style, children: children);
   }
 
   @override
-  TextSpan buildTextSpan({required BuildContext context, TextStyle? style, bool? withComposing}) {
+  TextSpan buildTextSpan({
+    required BuildContext context,
+    TextStyle? style,
+    bool? withComposing,
+  }) {
     // Retrieve pattern regexp
     final patternList = <String>[];
+
     if (_webSpaceFix) {
       patternList.add("(" + _MIDDLE_DOT + ")");
       styleList.add(TextStyle(color: Colors.transparent));
     }
+
     if (stringMap != null) {
       patternList.addAll(stringMap!.keys.map((e) => r'(\b' + e + r'\b)'));
       styleList.addAll(stringMap!.values);
     }
+
     if (patternMap != null) {
       patternList.addAll(patternMap!.keys.map((e) => "(" + e + ")"));
       styleList.addAll(patternMap!.values);
     }
+
     styleRegExp = RegExp(patternList.join('|'), multiLine: true);
 
     // Return parsing
