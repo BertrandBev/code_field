@@ -74,7 +74,7 @@ class CodeField extends StatefulWidget {
     this.background,
     this.decoration,
     this.textStyle,
-    this.padding = const EdgeInsets.symmetric(),
+    this.padding = EdgeInsets.zero,
     this.lineNumberStyle = const LineNumberStyle(),
     this.enabled,
     this.onTap,
@@ -106,7 +106,7 @@ class CodeFieldState extends State<CodeField> {
   StreamSubscription<bool>? _keyboardVisibilitySubscription;
   FocusNode? _focusNode;
   String? lines;
-  String longestLine = "";
+  String longestLine = '';
 
   @override
   void initState() {
@@ -147,18 +147,18 @@ class CodeFieldState extends State<CodeField> {
 
   void _onTextChanged() {
     // Rebuild line number
-    final str = widget.controller.text.split("\n");
+    final str = widget.controller.text.split('\n');
     final buf = <String>[];
 
     for (var k = 0; k < str.length; k++) {
       buf.add((k + 1).toString());
     }
 
-    _numberController?.text = buf.join("\n");
+    _numberController?.text = buf.join('\n');
 
     // Find longest line
-    longestLine = "";
-    widget.controller.text.split("\n").forEach((line) {
+    longestLine = '';
+    widget.controller.text.split('\n').forEach((line) {
       if (line.length > longestLine.length) longestLine = line;
     });
 
@@ -179,12 +179,12 @@ class CodeFieldState extends State<CodeField> {
         children: [
           ConstrainedBox(
             constraints: BoxConstraints(
-              maxHeight: 0.0,
-              minWidth: max(minWidth - leftPad, 0.0),
+              maxHeight: 0,
+              minWidth: max(minWidth - leftPad, 0),
             ),
             child: Padding(
+              padding: const EdgeInsets.only(right: 16),
               child: Text(longestLine, style: textStyle),
-              padding: const EdgeInsets.only(right: 16.0),
             ), // Add extra padding
           ),
           widget.expands ? Expanded(child: codeField) : codeField,
@@ -200,7 +200,8 @@ class CodeFieldState extends State<CodeField> {
       scrollDirection: Axis.horizontal,
 
       /// Prevents the horizontal scroll if horizontalScroll is false
-      physics: widget.horizontalScroll ? null : NeverScrollableScrollPhysics(),
+      physics:
+          widget.horizontalScroll ? null : const NeverScrollableScrollPhysics(),
       child: intrinsic,
     );
   }
@@ -208,27 +209,28 @@ class CodeFieldState extends State<CodeField> {
   @override
   Widget build(BuildContext context) {
     // Default color scheme
-    const ROOT_KEY = 'root';
+    const rootKey = 'root';
     final defaultBg = Colors.grey.shade900;
     final defaultText = Colors.grey.shade200;
 
     final styles = CodeTheme.of(context)?.styles;
     Color? backgroundCol =
-        widget.background ?? styles?[ROOT_KEY]?.backgroundColor ?? defaultBg;
+        widget.background ?? styles?[rootKey]?.backgroundColor ?? defaultBg;
 
     if (widget.decoration != null) {
       backgroundCol = null;
     }
 
-    TextStyle textStyle = widget.textStyle ?? TextStyle();
+    TextStyle textStyle = widget.textStyle ?? const TextStyle();
     textStyle = textStyle.copyWith(
-      color: textStyle.color ?? styles?[ROOT_KEY]?.color ?? defaultText,
+      color: textStyle.color ?? styles?[rootKey]?.color ?? defaultText,
       fontSize: textStyle.fontSize ?? 16.0,
     );
 
-    TextStyle numberTextStyle = widget.lineNumberStyle.textStyle ?? TextStyle();
+    TextStyle numberTextStyle =
+        widget.lineNumberStyle.textStyle ?? const TextStyle();
     final numberColor =
-        (styles?[ROOT_KEY]?.color ?? defaultText).withOpacity(0.7);
+        (styles?[rootKey]?.color ?? defaultText).withOpacity(0.7);
 
     // Copy important attributes
     numberTextStyle = numberTextStyle.copyWith(
@@ -238,7 +240,7 @@ class CodeFieldState extends State<CodeField> {
     );
 
     final cursorColor =
-        widget.cursorColor ?? styles?[ROOT_KEY]?.color ?? defaultText;
+        widget.cursorColor ?? styles?[rootKey]?.color ?? defaultText;
 
     TextField? lineNumberCol;
     Container? numberCol;
@@ -315,7 +317,7 @@ class CodeFieldState extends State<CodeField> {
     return Container(
       decoration: widget.decoration,
       color: backgroundCol,
-      padding: !widget.lineNumbers ? EdgeInsets.only(left: 8) : null,
+      padding: !widget.lineNumbers ? const EdgeInsets.only(left: 8) : null,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
