@@ -55,6 +55,9 @@ class CodeField extends StatefulWidget {
   /// {@macro flutter.widgets.textField.isDense}
   final bool isDense;
 
+  /// {@macro flutter.widgets.textField.selectionControls}
+  final TextSelectionControls? selectionControls;
+
   final Color? background;
   final EdgeInsets padding;
   final Decoration? decoration;
@@ -89,6 +92,7 @@ class CodeField extends StatefulWidget {
     this.keyboardType,
     this.lineNumbers = true,
     this.horizontalScroll = true,
+    this.selectionControls,
   }) : super(key: key);
 
   @override
@@ -254,6 +258,7 @@ class CodeFieldState extends State<CodeField> {
         enabled: false,
         minLines: widget.minLines,
         maxLines: widget.maxLines,
+        selectionControls: widget.selectionControls,
         expands: widget.expands,
         scrollController: _numberScroll,
         decoration: InputDecoration(
@@ -283,6 +288,7 @@ class CodeFieldState extends State<CodeField> {
       style: textStyle,
       controller: widget.controller,
       minLines: widget.minLines,
+      selectionControls: widget.selectionControls,
       maxLines: widget.maxLines,
       expands: widget.expands,
       scrollController: _codeScroll,

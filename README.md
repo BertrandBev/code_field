@@ -176,60 +176,68 @@ class TabModifier extends CodeModifier {
 }
 ```
 
-
 ## API
 
 ### CodeField
 
 ```dart
-CodeField({
-Key? key,
-  required this.controller,
-  this.minLines,
-  this.maxLines,
-  this.expands = false,
-  this.wrap = false,
-  this.background,
-  this.decoration,
-  this.textStyle,
-  this.padding = const EdgeInsets.symmetric(),
-  this.lineNumberStyle = const LineNumberStyle(),
-  this.enabled,
-  this.cursorColor,
-  this.textSelectionTheme,
-  this.lineNumberBuilder,
-  this.focusNode,
-  this.onTap,
-})
+const CodeField({
+    Key? key,
+    required this.controller,
+    this.minLines,
+    this.maxLines,
+    this.expands = false,
+    this.wrap = false,
+    this.background,
+    this.decoration,
+    this.textStyle,
+    this.padding = EdgeInsets.zero,
+    this.lineNumberStyle = const LineNumberStyle(),
+    this.enabled,
+    this.onTap,
+    this.readOnly = false,
+    this.cursorColor,
+    this.textSelectionTheme,
+    this.lineNumberBuilder,
+    this.focusNode,
+    this.onChanged,
+    this.isDense = false,
+    this.smartQuotesType,
+    this.keyboardType,
+    this.lineNumbers = true,
+    this.horizontalScroll = true,
+    this.selectionControls,
+  })
 ```
+### LineNumberStyle
 
 ```dart
-LineNumberStyle({
-  this.width = 42.0,
-  this.textAlign = TextAlign.right,
-  this.margin = 10.0,
-  this.textStyle,
-  this.background,
-})
+  const LineNumberStyle({
+    this.width = 42.0,
+    this.textAlign = TextAlign.right,
+    this.margin = 10.0,
+    this.textStyle,
+    this.background,
+  });
 ```
 
 ### CodeController
 
 ```dart
 CodeController({
-  String? text,
-  Mode? language,
-  Map<String, TextStyle>? theme,
-  this.patternMap,
-  this.stringMap,
-  this.params = const EditorParams(),
-  this.modifiers = const <CodeModifier>[
-    const IntendModifier(),
-    const CloseBlockModifier(),
-    const TabModifier(),
-  ],
-  this.onChange,
-})
+    String? text,
+    Mode? language,
+    this.patternMap,
+    this.stringMap,
+    this.params = const EditorParams(),
+    this.modifiers = const [
+      IntendModifier(),
+      CloseBlockModifier(),
+      TabModifier(),
+    ],
+    this.webSpaceFix = true,
+    this.onChange,
+  }) 
 ```
 
 ## Limitations
