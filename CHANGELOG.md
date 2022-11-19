@@ -52,3 +52,8 @@
 * added keyboardType to CodeField API as optional parameter
 * solves 'enter' linebreak bug
 * adds a macos desktop example app
+
+## [1.1.0] - 2022-11-19
+
+* removed webSpaceFix (https://github.com/flutter/flutter/issues/77929)
+* 

@@ -65,11 +65,6 @@ class CodeController extends TextEditingController {
   /// A list of code modifiers to dynamically update the code upon certain keystrokes
   final List<CodeModifier> modifiers;
 
-  /// On web, replace spaces with invisible dots “·” to fix the current issue with spaces
-  ///
-  /// https://github.com/flutter/flutter/issues/77929
-  final bool webSpaceFix;
-
   /// onChange callback, called whenever the content is changed
   final void Function(String)? onChange;
 
@@ -95,7 +90,6 @@ class CodeController extends TextEditingController {
       CloseBlockModifier(),
       TabModifier(),
     ],
-    this.webSpaceFix = true,
     this.onChange,
   })  : _theme = theme,
         super(text: text) {
@@ -168,29 +162,6 @@ class CodeController extends TextEditingController {
     return KeyEventResult.ignored;
   }
 
-  /// See webSpaceFix
-  static String _spacesToMiddleDots(String str) {
-    return str.replaceAll(' ', _middleDot);
-  }
-
-  /// See webSpaceFix
-  static String _middleDotsToSpaces(String str) {
-    return str.replaceAll(_middleDot, ' ');
-  }
-
-  /// Get untransformed text
-  /// See webSpaceFix
-  String get rawText {
-    if (!_webSpaceFix) {
-      return super.text;
-    }
-
-    return _middleDotsToSpaces(super.text);
-  }
-
-  // Private methods
-  bool get _webSpaceFix => kIsWeb && webSpaceFix;
-
   static String _genId() {
     const chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
     final rnd = Random();
@@ -220,7 +191,7 @@ class CodeController extends TextEditingController {
     if (loc != null) {
       final char = newValue.text[loc];
       final modifier = modifierMap[char];
-      final val = modifier?.updateString(rawText, selection, params);
+      final val = modifier?.updateString(super.text, selection, params);
 
       if (val != null) {
         // Update newValue
@@ -231,15 +202,7 @@ class CodeController extends TextEditingController {
       }
     }
 
-    // Now fix the textfield for web
-    if (_webSpaceFix) {
-      newValue = newValue.copyWith(text: _spacesToMiddleDots(newValue.text));
-    }
-
-    onChange?.call(
-      _webSpaceFix ? _middleDotsToSpaces(newValue.text) : newValue.text,
-    );
-
+    onChange?.call(newValue.text);
     super.value = newValue;
   }
 
@@ -280,8 +243,7 @@ class CodeController extends TextEditingController {
     CodeThemeData? widgetTheme,
     TextStyle? style,
   ) {
-    final rawText = _webSpaceFix ? _middleDotsToSpaces(text) : text;
-    final result = highlight.parse(rawText, language: _languageId);
+    final result = highlight.parse(text, language: _languageId);
 
     final nodes = result.nodes;
 
@@ -296,10 +258,6 @@ class CodeController extends TextEditingController {
           widgetTheme?.styles[node.className] ?? _theme?[node.className];
 
       if (val != null) {
-        if (_webSpaceFix) {
-          val = _spacesToMiddleDots(val);
-        }
-
         var child = TextSpan(text: val, style: nodeStyle);
 
         if (styleRegExp != null) {
@@ -342,11 +300,6 @@ class CodeController extends TextEditingController {
   }) {
     // Retrieve pattern regexp
     final patternList = <String>[];
-
-    if (_webSpaceFix) {
-      patternList.add('($_middleDot)');
-      styleList.add(const TextStyle(color: Colors.transparent));
-    }
 
     if (stringMap != null) {
       patternList.addAll(stringMap!.keys.map((e) => r'(\b' + e + r'\b)'));
