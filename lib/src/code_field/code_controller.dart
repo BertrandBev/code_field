@@ -70,12 +70,12 @@ class CodeController extends TextEditingController {
 
   /* Computed members */
   String _languageId = _genId();
+  final _modifierMap = <String, CodeModifier>{};
+  final _styleList = <TextStyle>[];
+  RegExp? _styleRegExp;
 
   String get languageId => _languageId;
 
-  final styleList = <TextStyle>[];
-  final modifierMap = <String, CodeModifier>{};
-  RegExp? styleRegExp;
 
   CodeController({
     String? text,
@@ -97,8 +97,20 @@ class CodeController extends TextEditingController {
 
     // Create modifier map
     for (final el in modifiers) {
-      modifierMap[el.char] = el;
+      _modifierMap[el.char] = el;
     }
+
+    // Build styleRegExp
+    final patternList = <String>[];
+    if (stringMap != null) {
+      patternList.addAll(stringMap!.keys.map((e) => r'(\b' + e + r'\b)'));
+      _styleList.addAll(stringMap!.values);
+    }
+    if (patternMap != null) {
+      patternList.addAll(patternMap!.keys.map((e) => '($e)'));
+      _styleList.addAll(patternMap!.values);
+    }
+    _styleRegExp = RegExp(patternList.join('|'), multiLine: true);
   }
 
   /// Sets a specific cursor position in the text
@@ -190,7 +202,7 @@ class CodeController extends TextEditingController {
 
     if (loc != null) {
       final char = newValue.text[loc];
-      final modifier = modifierMap[char];
+      final modifier = _modifierMap[char];
       final val = modifier?.updateString(super.text, selection, params);
 
       if (val != null) {
@@ -210,22 +222,22 @@ class CodeController extends TextEditingController {
     final children = <TextSpan>[];
 
     text.splitMapJoin(
-      styleRegExp!,
+      _styleRegExp!,
       onMatch: (Match m) {
-        if (styleList.isEmpty) {
+        if (_styleList.isEmpty) {
           return '';
         }
 
         int idx;
         for (idx = 1;
             idx < m.groupCount &&
-                idx <= styleList.length &&
+                idx <= _styleList.length &&
                 m.group(idx) == null;
             idx++) {}
 
         children.add(TextSpan(
           text: m[0],
-          style: styleList[idx - 1],
+          style: _styleList[idx - 1],
         ));
         return '';
       },
@@ -260,7 +272,7 @@ class CodeController extends TextEditingController {
       if (val != null) {
         var child = TextSpan(text: val, style: nodeStyle);
 
-        if (styleRegExp != null) {
+        if (_styleRegExp != null) {
           child = _processPatterns(val, nodeStyle);
         }
 
@@ -298,30 +310,13 @@ class CodeController extends TextEditingController {
     TextStyle? style,
     bool? withComposing,
   }) {
-    // Retrieve pattern regexp
-    final patternList = <String>[];
-
-    if (stringMap != null) {
-      patternList.addAll(stringMap!.keys.map((e) => r'(\b' + e + r'\b)'));
-      styleList.addAll(stringMap!.values);
-    }
-
-    if (patternMap != null) {
-      patternList.addAll(patternMap!.keys.map((e) => '($e)'));
-      styleList.addAll(patternMap!.values);
-    }
-
-    styleRegExp = RegExp(patternList.join('|'), multiLine: true);
-
     // Return parsing
     if (_language != null) {
       return _processLanguage(text, CodeTheme.of(context), style);
     }
-
-    if (styleRegExp != null) {
+    if (_styleRegExp != null) {
       return _processPatterns(text, style);
     }
-
     return TextSpan(text: text, style: style);
   }
 }
