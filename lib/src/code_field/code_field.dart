@@ -96,7 +96,7 @@ class CodeField extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _CodeFieldState createState() => _CodeFieldState();
+  State<CodeField> createState() => _CodeFieldState();
 }
 
 class _CodeFieldState extends State<CodeField> {
