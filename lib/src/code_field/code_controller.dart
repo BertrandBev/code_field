@@ -24,7 +24,7 @@ class CodeController extends TextEditingController {
     }
 
     if (language != null) {
-      _languageId = _genId();
+      _languageId = language.hashCode.toString();
       highlight.registerLanguage(_languageId, language);
     }
 
@@ -47,7 +47,7 @@ class CodeController extends TextEditingController {
   final List<CodeModifier> modifiers;
 
   /* Computed members */
-  String _languageId = _genId();
+  String _languageId = '';
   final _modifierMap = <String, CodeModifier>{};
   final _styleList = <TextStyle>[];
   RegExp? _styleRegExp;
@@ -147,18 +147,6 @@ class CodeController extends TextEditingController {
     }
 
     return KeyEventResult.ignored;
-  }
-
-  static String _genId() {
-    const chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
-    final rnd = Random();
-
-    return String.fromCharCodes(
-      Iterable.generate(
-        10,
-        (_) => chars.codeUnitAt(rnd.nextInt(chars.length)),
-      ),
-    );
   }
 
   int? _insertedLoc(String a, String b) {
