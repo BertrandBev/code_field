@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:highlight/highlight_core.dart';
@@ -12,8 +11,6 @@ import '../code_modifiers/tab_code_modifier.dart';
 import '../code_theme/code_theme.dart';
 import '../code_theme/code_theme_data.dart';
 import 'editor_params.dart';
-
-const _middleDot = '·';
 
 class CodeController extends TextEditingController {
   Mode? _language;
@@ -35,22 +32,6 @@ class CodeController extends TextEditingController {
     notifyListeners();
   }
 
-  // Map<String, TextStyle>? _theme;
-
-  // /// The theme to apply to the [language] parsing result
-  // @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
-  // Map<String, TextStyle>? get theme => _theme;
-
-  // @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
-  // set theme(Map<String, TextStyle>? theme) {
-  //   if (theme == _theme) {
-  //     return;
-  //   }
-
-  //   _theme = theme;
-  //   notifyListeners();
-  // }
-
   /// A map of specific regexes to style
   final Map<String, TextStyle>? patternMap;
 
@@ -65,9 +46,6 @@ class CodeController extends TextEditingController {
   /// A list of code modifiers to dynamically update the code upon certain keystrokes
   final List<CodeModifier> modifiers;
 
-  /// onChange callback, called whenever the content is changed
-  final void Function(String)? onChange;
-
   /* Computed members */
   String _languageId = _genId();
   final _modifierMap = <String, CodeModifier>{};
@@ -75,7 +53,6 @@ class CodeController extends TextEditingController {
   RegExp? _styleRegExp;
 
   String get languageId => _languageId;
-
 
   CodeController({
     String? text,
@@ -90,7 +67,6 @@ class CodeController extends TextEditingController {
       CloseBlockModifier(),
       TabModifier(),
     ],
-    this.onChange,
   }) : super(text: text) {
     this.language = language;
 
@@ -212,8 +188,6 @@ class CodeController extends TextEditingController {
         );
       }
     }
-
-    onChange?.call(newValue.text);
     super.value = newValue;
   }
 
@@ -262,7 +236,7 @@ class CodeController extends TextEditingController {
     var currentSpans = children;
     final stack = <List<TextSpan>>[];
 
-    void _traverse(Node node) {
+    void traverse(Node node) {
       var val = node.value;
       final nodeChildren = node.children;
       final nodeStyle = widgetTheme?.styles[node.className];
@@ -287,7 +261,7 @@ class CodeController extends TextEditingController {
         currentSpans = tmp;
 
         for (final n in nodeChildren) {
-          _traverse(n);
+          traverse(n);
           if (n == nodeChildren.last) {
             currentSpans = stack.isEmpty ? children : stack.removeLast();
           }
@@ -296,7 +270,7 @@ class CodeController extends TextEditingController {
     }
 
     if (nodes != null) {
-      nodes.forEach(_traverse);
+      nodes.forEach(traverse);
     }
 
     return TextSpan(style: style, children: children);

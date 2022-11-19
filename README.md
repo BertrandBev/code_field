@@ -235,7 +235,6 @@ CodeController({
       CloseBlockModifier(),
       TabModifier(),
     ],
-    this.onChange,
   }) 
 ```
 
