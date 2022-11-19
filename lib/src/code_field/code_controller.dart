@@ -35,21 +35,21 @@ class CodeController extends TextEditingController {
     notifyListeners();
   }
 
-  Map<String, TextStyle>? _theme;
+  // Map<String, TextStyle>? _theme;
 
-  /// The theme to apply to the [language] parsing result
-  @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
-  Map<String, TextStyle>? get theme => _theme;
+  // /// The theme to apply to the [language] parsing result
+  // @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
+  // Map<String, TextStyle>? get theme => _theme;
 
-  @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
-  set theme(Map<String, TextStyle>? theme) {
-    if (theme == _theme) {
-      return;
-    }
+  // @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
+  // set theme(Map<String, TextStyle>? theme) {
+  //   if (theme == _theme) {
+  //     return;
+  //   }
 
-    _theme = theme;
-    notifyListeners();
-  }
+  //   _theme = theme;
+  //   notifyListeners();
+  // }
 
   /// A map of specific regexes to style
   final Map<String, TextStyle>? patternMap;
@@ -80,8 +80,8 @@ class CodeController extends TextEditingController {
   CodeController({
     String? text,
     Mode? language,
-    @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
-        Map<String, TextStyle>? theme,
+    // @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
+    //     Map<String, TextStyle>? theme,
     this.patternMap,
     this.stringMap,
     this.params = const EditorParams(),
@@ -91,8 +91,7 @@ class CodeController extends TextEditingController {
       TabModifier(),
     ],
     this.onChange,
-  })  : _theme = theme,
-        super(text: text) {
+  }) : super(text: text) {
     this.language = language;
 
     // Create modifier map
@@ -266,8 +265,7 @@ class CodeController extends TextEditingController {
     void _traverse(Node node) {
       var val = node.value;
       final nodeChildren = node.children;
-      final nodeStyle =
-          widgetTheme?.styles[node.className] ?? _theme?[node.className];
+      final nodeStyle = widgetTheme?.styles[node.className];
 
       if (val != null) {
         var child = TextSpan(text: val, style: nodeStyle);
