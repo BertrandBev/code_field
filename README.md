@@ -231,7 +231,7 @@ CodeController({
     this.stringMap,
     this.params = const EditorParams(),
     this.modifiers = const [
-      IntendModifier(),
+      IndentModifier(),
       CloseBlockModifier(),
       TabModifier(),
     ],

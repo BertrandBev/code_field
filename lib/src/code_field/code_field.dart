@@ -96,11 +96,10 @@ class CodeField extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  CodeFieldState createState() => CodeFieldState();
+  _CodeFieldState createState() => _CodeFieldState();
 }
 
-// TODO: Make private in next breaking release.
-class CodeFieldState extends State<CodeField> {
+class _CodeFieldState extends State<CodeField> {
   // Add a controller
   LinkedScrollControllerGroup? _controllers;
   ScrollController? _numberScroll;
