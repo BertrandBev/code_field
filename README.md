@@ -53,7 +53,7 @@ dependencies:
 In your library add the following import:
 
 ```dart
-import 'package:code_text_field/code_field.dart';
+import 'package:code_text_field/code_text_field.dart';
 ```
 
 
