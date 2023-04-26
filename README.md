@@ -25,7 +25,7 @@ The experimental VM [dlox](https://github.com/BertrandBev/dlox) uses **CodeField
 - Fully customizable code field style through a TextField like API
 - Handles horizontal/vertical scrolling and vertical expansion
 - Supports code modifiers
-- Works on Android, iOS, and Web
+- Works on Android, iOS, Web, MacOS, Windows, and Linux
 
 Code modifiers help manage indents automatically
 
@@ -84,7 +84,6 @@ class _CodeEditorState extends State<CodeEditor> {
     _codeController = CodeController(
       text: source,
       language: dart,
-      theme: monokaiSublimeTheme,
     );
   }
 
@@ -96,9 +95,12 @@ class _CodeEditorState extends State<CodeEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return CodeField(
-      controller: _codeController!,
-      textStyle: TextStyle(fontFamily: 'SourceCode'),
+    return CodeTheme(
+      data: const CodeThemeData(styles: monokaiSublimeTheme),
+      child: CodeField(
+        controller: _codeController!,
+        textStyle: const TextStyle(fontFamily: 'SourceCode'),
+      ),
     );
   }
 }
@@ -106,12 +108,12 @@ class _CodeEditorState extends State<CodeEditor> {
 
 <img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/example_0.png" width="60%">
 
-Here, the monospace font [Source Code Pro](https://fonts.google.com/specimen/Source+Code+Pro?preview.text_type=custom) has been added to the assets folder and to the [pubspec.yaml](https://github.com/BertrandBev/code_field/blob/master/example/pubspec.yaml) file
+Here, the monospace font [Source Code Pro](https://fonts.google.com/specimen/Source+Code+Pro?preview.text_type=custom) has been added to the assets folder and to the [pubspec.yaml](https://github.com/BertrandBev/code_field/blob/master/example/pubspec.yaml) file.
 
 
 ## Parser options
 
-On top of a language definition, world-wise styling can be specified in the **stringMap** field
+On top of a language definition, word-wise styling can be specified in the **stringMap** field
 
 ```dart
 _codeController = CodeController(
@@ -139,7 +141,7 @@ _codeController = CodeController(
 
 <img src="https://raw.githubusercontent.com/BertrandBev/code_field/master/doc/images/example_2.png" width="60%">
 
-Both **patternMap** and **stringMap** can be used without specifying a language
+Both **patternMap** and **stringMap** can be used without specifying a language.
 
 ```dart
 _codeController = CodeController(
