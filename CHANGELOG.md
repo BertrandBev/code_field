@@ -56,4 +56,5 @@
 ## [1.1.0] - 2022-11-19
 
 * removed webSpaceFix (https://github.com/flutter/flutter/issues/77929)
-* Fixed #58, #59, #60, #62, #64
+* fixed #43, #58, #59, #60, #62, #64
+* updated dependencies

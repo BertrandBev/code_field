@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:highlight/highlight_core.dart';
@@ -152,7 +150,7 @@ class CodeController extends TextEditingController {
   int? _insertedLoc(String a, String b) {
     final sel = selection;
 
-    if (a.length + 1 != b.length || sel.start != sel.end) {
+    if (a.length + 1 != b.length || sel.start != sel.end || sel.start < 0) {
       return null;
     }
 
