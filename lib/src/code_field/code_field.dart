@@ -66,6 +66,8 @@ class CodeField extends StatefulWidget {
   final void Function()? onTap;
   final bool lineNumbers;
   final bool horizontalScroll;
+  final String? hintText;
+  final TextStyle? hintStyle;
 
   const CodeField({
     Key? key,
@@ -93,6 +95,8 @@ class CodeField extends StatefulWidget {
     this.lineNumbers = true,
     this.horizontalScroll = true,
     this.selectionControls,
+    this.hintText,
+    this.hintStyle,
   }) : super(key: key);
 
   @override
@@ -296,6 +300,8 @@ class _CodeFieldState extends State<CodeField> {
         border: InputBorder.none,
         focusedBorder: InputBorder.none,
         isDense: widget.isDense,
+        hintText: widget.hintText,
+        hintStyle: widget.hintStyle,
       ),
       cursorColor: cursorColor,
       autocorrect: false,

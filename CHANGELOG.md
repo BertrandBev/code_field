@@ -58,3 +58,7 @@
 * removed webSpaceFix (https://github.com/flutter/flutter/issues/77929)
 * fixed #43, #58, #59, #60, #62, #64
 * updated dependencies
+
+## [1.1.1] - 2023-07-06
+
+* added hintText and hintStyle to CodeField API as optional parameters
