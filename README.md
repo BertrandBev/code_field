@@ -209,6 +209,8 @@ const CodeField({
     this.lineNumbers = true,
     this.horizontalScroll = true,
     this.selectionControls,
+    this.hintText,
+    this.hintStyle,
   })
 ```
 ### LineNumberStyle
