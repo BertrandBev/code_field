@@ -8,10 +8,12 @@ import '../code_modifiers/indent_code_modifier.dart';
 import '../code_modifiers/tab_code_modifier.dart';
 import '../code_theme/code_theme.dart';
 import '../code_theme/code_theme_data.dart';
+import 'code_auto_complete.dart';
 import 'editor_params.dart';
 
 class CodeController extends TextEditingController {
   Mode? _language;
+  CodeAutoComplete? autoComplete;
 
   /// A highlight language to parse the text with
   Mode? get language => _language;
@@ -142,6 +144,29 @@ class CodeController extends TextEditingController {
     if (event.isKeyPressed(LogicalKeyboardKey.tab)) {
       text = text.replaceRange(selection.start, selection.end, '\t');
       return KeyEventResult.handled;
+    }
+
+    if (autoComplete?.isShowing ?? false) {
+      if (event.isKeyPressed(LogicalKeyboardKey.arrowDown)) {
+        autoComplete!.current =
+            (autoComplete!.current + 1) % autoComplete!.options.length;
+        autoComplete!.panelSetState?.call(() {});
+        return KeyEventResult.handled;
+      }
+      if (event.isKeyPressed(LogicalKeyboardKey.arrowUp)) {
+        autoComplete!.current =
+            (autoComplete!.current - 1) % autoComplete!.options.length;
+        autoComplete!.panelSetState?.call(() {});
+        return KeyEventResult.handled;
+      }
+      if (event.isKeyPressed(LogicalKeyboardKey.enter)) {
+        autoComplete!.writeCurrent();
+        return KeyEventResult.handled;
+      }
+      if (event.isKeyPressed(LogicalKeyboardKey.escape)) {
+        autoComplete!.hide();
+        return KeyEventResult.handled;
+      }
     }
 
     return KeyEventResult.ignored;
