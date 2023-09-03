@@ -329,7 +329,7 @@ class _CodeFieldState extends State<CodeField> {
         hintStyle: widget.hintStyle,
       ),
       onTapOutside: (e) {
-        hideAutoComplete();
+        Future.delayed(const Duration(milliseconds: 300), hideAutoComplete);
       },
       cursorColor: cursorColor,
       autocorrect: false,
