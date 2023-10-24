@@ -14,6 +14,9 @@ class CodeField extends StatefulWidget {
   /// {@macro flutter.widgets.textField.smartQuotesType}
   final SmartQuotesType? smartQuotesType;
 
+/// {@macro flutter.widgets.textField.smartDashesType}
+  final SmartDashesType? smartDashesType;
+
   /// {@macro flutter.widgets.textField.keyboardType}
   final TextInputType? keyboardType;
 
@@ -93,6 +96,7 @@ class CodeField extends StatefulWidget {
     this.onChanged,
     this.isDense = false,
     this.smartQuotesType,
+    this.smartDashesType,
     this.keyboardType,
     this.lineNumbers = true,
     this.horizontalScroll = true,
@@ -277,6 +281,7 @@ class _CodeFieldState extends State<CodeField> {
     if (widget.lineNumbers) {
       lineNumberCol = TextField(
         smartQuotesType: widget.smartQuotesType,
+        smartDashesType: widget.smartDashesType,
         scrollPadding: widget.padding,
         style: numberTextStyle,
         controller: _numberController,
@@ -307,6 +312,7 @@ class _CodeFieldState extends State<CodeField> {
     final codeField = TextField(
       keyboardType: widget.keyboardType,
       smartQuotesType: widget.smartQuotesType,
+      smartDashesType: widget.smartDashesType,
       focusNode: _focusNode,
       onTap: () {
         widget.autoComplete?.hide();
