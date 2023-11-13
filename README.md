@@ -63,7 +63,7 @@ A CodeField widget works with a **CodeController** which dynamically parses the 
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:code_text_field/code_field.dart';
+import 'package:code_text_field/code_text_field.dart';
 // Import the language & theme
 import 'package:highlight/languages/dart.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
