@@ -62,6 +62,12 @@ class CodeField extends StatefulWidget {
   /// {@macro flutter.widgets.textField.selectionControls}
   final TextSelectionControls? selectionControls;
 
+  /// {@macro flutter.widgets.textField.textInputAction}
+  final TextInputAction? textInputAction;
+
+  /// {@macro flutter.services.TextInputConfiguration.enableSuggestions}
+  final bool enableSuggestions;
+
   final Color? background;
   final EdgeInsets padding;
   final Decoration? decoration;
@@ -104,6 +110,8 @@ class CodeField extends StatefulWidget {
     this.hintText,
     this.hintStyle,
     this.autoComplete,
+    this.textInputAction,
+    this.enableSuggestions = false,
   }) : super(key: key);
 
   @override
@@ -339,13 +347,14 @@ class _CodeFieldState extends State<CodeField> {
       },
       cursorColor: cursorColor,
       autocorrect: false,
-      enableSuggestions: false,
+      enableSuggestions: widget.enableSuggestions,
       enabled: widget.enabled,
       onChanged: (text) {
         widget.onChanged?.call(text);
         widget.autoComplete?.streamController.add(text);
       },
       readOnly: widget.readOnly,
+      textInputAction: widget.textInputAction,
     );
 
     final codeCol = Theme(
