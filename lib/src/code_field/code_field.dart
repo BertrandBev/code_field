@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
@@ -225,17 +228,21 @@ class _CodeFieldState extends State<CodeField> {
       ),
     );
 
-    return SingleChildScrollView(
-      padding: EdgeInsets.only(
-        left: leftPad,
-        right: widget.padding.right,
+    return MediaQuery(
+      // TODO: Temporary fix: https://github.com/flutter/flutter/issues/127017
+      data: !kIsWeb && Platform.isIOS
+          ? const MediaQueryData(
+              gestureSettings: DeviceGestureSettings(touchSlop: 8),
+            )
+          : MediaQuery.of(context),
+      child: SingleChildScrollView(
+        padding: EdgeInsets.only(
+          left: leftPad,
+          right: widget.padding.right,
+        ),
+        scrollDirection: Axis.horizontal,
+        child: intrinsic,
       ),
-      scrollDirection: Axis.horizontal,
-
-      /// Prevents the horizontal scroll if horizontalScroll is false
-      physics:
-          widget.horizontalScroll ? null : const NeverScrollableScrollPhysics(),
-      child: intrinsic,
     );
   }
 
