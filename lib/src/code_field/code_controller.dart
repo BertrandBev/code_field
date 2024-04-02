@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:highlight/highlight_core.dart';
@@ -83,7 +82,7 @@ class CodeController extends TextEditingController {
       _styleList.addAll(stringMap!.values);
     }
     if (patternMap != null) {
-      patternList.addAll(patternMap!.keys.map((e) => '($e)'));
+      patternList.addAll(patternMap!.keys.map((e) => r'($e)'));
       _styleList.addAll(patternMap!.values);
     }
     _styleRegExp = RegExp(patternList.join('|'), multiLine: true);
@@ -302,27 +301,5 @@ class CodeController extends TextEditingController {
       return _processPatterns(text, style);
     }
     return TextSpan(text: text, style: style);
-  }
-
-  CodeController copyWith({
-    Mode? _language,
-    CodeAutoComplete? autoComplete,
-    Map<String, TextStyle>? patternMap,
-    Map<String, TextStyle>? stringMap,
-    EditorParams? params,
-    List<CodeModifier>? modifiers,
-    String? _languageId,
-    RegExp? _styleRegExp,
-  }) {
-    return CodeController(
-      _language: _language ?? this._language,
-      autoComplete: autoComplete ?? this.autoComplete,
-      patternMap: patternMap ?? this.patternMap,
-      stringMap: stringMap ?? this.stringMap,
-      params: params ?? this.params,
-      modifiers: modifiers ?? this.modifiers,
-      _languageId: _languageId ?? this._languageId,
-      _styleRegExp: _styleRegExp ?? this._styleRegExp,
-    );
   }
 }
