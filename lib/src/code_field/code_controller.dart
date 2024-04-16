@@ -86,7 +86,7 @@ class CodeController extends TextEditingController {
       patternList.addAll(patternMap!.keys.map((e) => '($e)'));
       _styleList.addAll(patternMap!.values);
     }
-    _styleRegExp = RegExp(patternList.join('|'), multiLine: true);
+    _styleRegExp = RegExp(patternList.join('|'), multiLine: true, unicode: true);
   }
 
   /// Sets a specific cursor position in the text
