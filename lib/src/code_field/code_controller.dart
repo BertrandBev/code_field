@@ -86,7 +86,8 @@ class CodeController extends TextEditingController {
       patternList.addAll(patternMap!.keys.map((e) => '($e)'));
       _styleList.addAll(patternMap!.values);
     }
-    _styleRegExp = RegExp(patternList.join('|'), multiLine: true, unicode: true);
+    _styleRegExp =
+        RegExp(patternList.join('|'), multiLine: true, unicode: true);
   }
 
   /// Sets a specific cursor position in the text
@@ -305,24 +306,18 @@ class CodeController extends TextEditingController {
   }
 
   CodeController copyWith({
-    Mode? _language,
-    CodeAutoComplete? autoComplete,
+    Mode? language,
     Map<String, TextStyle>? patternMap,
     Map<String, TextStyle>? stringMap,
     EditorParams? params,
     List<CodeModifier>? modifiers,
-    String? _languageId,
-    RegExp? _styleRegExp,
   }) {
     return CodeController(
-      _language: _language ?? this._language,
-      autoComplete: autoComplete ?? this.autoComplete,
+      language: language ?? this.language,
       patternMap: patternMap ?? this.patternMap,
       stringMap: stringMap ?? this.stringMap,
       params: params ?? this.params,
       modifiers: modifiers ?? this.modifiers,
-      _languageId: _languageId ?? this._languageId,
-      _styleRegExp: _styleRegExp ?? this._styleRegExp,
     );
   }
 }

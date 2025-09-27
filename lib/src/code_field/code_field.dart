@@ -17,7 +17,7 @@ class CodeField extends StatefulWidget {
   /// {@macro flutter.widgets.textField.smartQuotesType}
   final SmartQuotesType? smartQuotesType;
 
-/// {@macro flutter.widgets.textField.smartDashesType}
+  /// {@macro flutter.widgets.textField.smartDashesType}
   final SmartDashesType? smartDashesType;
 
   /// {@macro flutter.widgets.textField.keyboardType}
@@ -64,13 +64,13 @@ class CodeField extends StatefulWidget {
 
   /// {@macro flutter.widgets.textField.selectionControls}
   final TextSelectionControls? selectionControls;
+  final Key? fieldKey;
 
   /// {@macro flutter.widgets.textField.textInputAction}
   final TextInputAction? textInputAction;
 
   /// {@macro flutter.services.TextInputConfiguration.enableSuggestions}
   final bool enableSuggestions;
-
   final Color? background;
   final EdgeInsets padding;
   final Decoration? decoration;
@@ -86,6 +86,7 @@ class CodeField extends StatefulWidget {
   const CodeField({
     Key? key,
     required this.controller,
+    this.fieldKey,
     this.minLines,
     this.maxLines,
     this.expands = false,
@@ -132,6 +133,10 @@ class _CodeFieldState extends State<CodeField> {
   FocusNode? _focusNode;
   String? lines;
   String longestLine = '';
+  // Track the available width of the code column in order to compute
+  // visual line wrapping for line-numbers.
+  double _codeColumnWidth = 0;
+  var _currentTextStyle = const TextStyle();
 
   @override
   void initState() {
@@ -186,8 +191,34 @@ class _CodeFieldState extends State<CodeField> {
     final str = widget.controller.text.split('\n');
     final buf = <String>[];
 
-    for (var k = 0; k < str.length; k++) {
-      buf.add((k + 1).toString());
+    if (widget.wrap && _codeColumnWidth > 0) {
+      // When wrapping is enabled we need to account for visual lines that
+      // are created by the soft wrap. We measure each logical line using a
+      // TextPainter and add blank placeholders so the scrolling offset of
+      // the linked controllers stays in sync.
+      for (var k = 0; k < str.length; k++) {
+        final logicalLine = str[k];
+
+        // Compute how many visual lines this logical line occupies.
+        final tp = TextPainter(
+          text: TextSpan(text: logicalLine, style: _currentTextStyle),
+          textDirection: TextDirection.ltr,
+        )..layout(maxWidth: _codeColumnWidth);
+        final visualLines = tp.computeLineMetrics().length;
+
+        // First visual line gets the real line number.
+        buf.add((k + 1).toString());
+
+        // Remaining visual lines get an empty placeholder so that the
+        // total number of lines matches the code field.
+        for (int v = 1; v < visualLines; v++) {
+          buf.add('');
+        }
+      }
+    } else {
+      for (var k = 0; k < str.length; k++) {
+        buf.add((k + 1).toString());
+      }
     }
 
     _numberController?.text = buf.join('\n');
@@ -325,6 +356,7 @@ class _CodeFieldState extends State<CodeField> {
     }
 
     final codeField = TextField(
+      key: widget.fieldKey,
       keyboardType: widget.keyboardType,
       smartQuotesType: widget.smartQuotesType,
       smartDashesType: widget.smartDashesType,
@@ -369,7 +401,7 @@ class _CodeFieldState extends State<CodeField> {
         textSelectionTheme: widget.textSelectionTheme,
       ),
       child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
+        builder: (context, constraints) {
           // Control horizontal scrolling
           return widget.wrap
               ? codeField
@@ -386,7 +418,34 @@ class _CodeFieldState extends State<CodeField> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (widget.lineNumbers && numberCol != null) numberCol,
-          Expanded(child: codeCol),
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                // Save the textStyle and available width so _onTextChanged can
+                // accurately compute the amount of visual lines when wrapping.
+                _currentTextStyle = textStyle;
+                // Subtract left padding that will be applied inside the
+                // SingleChildScrollView when horizontal scrolling is disabled.
+                var availableWidth = constraints.maxWidth;
+
+                const caretMargin = 3.0; // 1 gap + 2 cursor
+                availableWidth -= caretMargin;
+
+                if ((availableWidth - _codeColumnWidth).abs() > 0.5) {
+                  _codeColumnWidth = max(0, availableWidth);
+                  print('availableWidth: $availableWidth');
+                  // Recalculate the line numbers because wrapping may have
+                  // changed due to a width change.
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted) {
+                      _onTextChanged();
+                    }
+                  });
+                }
+                return codeCol;
+              },
+            ),
+          ),
         ],
       ),
     );

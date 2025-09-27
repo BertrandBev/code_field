@@ -18,14 +18,19 @@ class LineNumberController extends TextEditingController {
 
     for (int k = 0; k < list.length; k++) {
       final el = list[k];
-      final number = int.parse(el);
-      var textSpan = TextSpan(text: el, style: style);
-
-      if (lineNumberBuilder != null) {
-        textSpan = lineNumberBuilder!(number, style);
+      // Blank lines are placeholders inserted to align with wrapped
+      // visual lines. They should render as empty text spans to
+      // preserve vertical spacing.
+      if (el.trim().isEmpty) {
+        children.add(TextSpan(text: '', style: style));
+      } else {
+        final number = int.tryParse(el) ?? 0;
+        var textSpan = TextSpan(text: el, style: style);
+        if (lineNumberBuilder != null && number != 0) {
+          textSpan = lineNumberBuilder!(number, style);
+        }
+        children.add(textSpan);
       }
-
-      children.add(textSpan);
       if (k < list.length - 1) {
         children.add(const TextSpan(text: '\n'));
       }
