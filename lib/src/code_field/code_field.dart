@@ -4,8 +4,8 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../code_theme/code_theme.dart';
 import '../line_numbers/line_number_controller.dart';
@@ -17,7 +17,7 @@ class CodeField extends StatefulWidget {
   /// {@macro flutter.widgets.textField.smartQuotesType}
   final SmartQuotesType? smartQuotesType;
 
-/// {@macro flutter.widgets.textField.smartDashesType}
+  /// {@macro flutter.widgets.textField.smartDashesType}
   final SmartDashesType? smartDashesType;
 
   /// {@macro flutter.widgets.textField.keyboardType}
@@ -142,8 +142,7 @@ class _CodeFieldState extends State<CodeField> {
     _numberController = LineNumberController(widget.lineNumberBuilder);
     widget.controller.addListener(_onTextChanged);
     _focusNode = widget.focusNode ?? FocusNode();
-    _focusNode!.onKey = _onKey;
-    _focusNode!.attach(context, onKey: _onKey);
+    _focusNode!.onKeyEvent = _onKeyEvent;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       createAutoComplate();
@@ -158,12 +157,12 @@ class _CodeFieldState extends State<CodeField> {
     _codeScroll?.addListener(hideAutoComplete);
   }
 
-  KeyEventResult _onKey(FocusNode node, RawKeyEvent event) {
+  KeyEventResult _onKeyEvent(FocusNode node, KeyEvent event) {
     if (widget.readOnly) {
       return KeyEventResult.ignored;
     }
 
-    return widget.controller.onKey(event);
+    return widget.controller.onKeyEvent(event);
   }
 
   @override
@@ -174,6 +173,10 @@ class _CodeFieldState extends State<CodeField> {
     _numberController?.dispose();
     _keyboardVisibilitySubscription?.cancel();
     widget.autoComplete?.remove();
+
+    if (widget.focusNode == null) {
+      _focusNode?.dispose();
+    }
     super.dispose();
   }
 
@@ -203,10 +206,10 @@ class _CodeFieldState extends State<CodeField> {
 
   // Wrap the codeField in a horizontal scrollView
   Widget _wrapInScrollView(
-    Widget codeField,
-    TextStyle textStyle,
-    double minWidth,
-  ) {
+      Widget codeField,
+      TextStyle textStyle,
+      double minWidth,
+      ) {
     final leftPad = widget.lineNumberStyle.margin / 2;
     final intrinsic = IntrinsicWidth(
       child: Column(
@@ -232,8 +235,8 @@ class _CodeFieldState extends State<CodeField> {
       // TODO: Temporary fix: https://github.com/flutter/flutter/issues/127017
       data: !kIsWeb && Platform.isIOS
           ? const MediaQueryData(
-              gestureSettings: DeviceGestureSettings(touchSlop: 8),
-            )
+        gestureSettings: DeviceGestureSettings(touchSlop: 8),
+      )
           : MediaQuery.of(context),
       child: SingleChildScrollView(
         padding: EdgeInsets.only(
@@ -278,7 +281,7 @@ class _CodeFieldState extends State<CodeField> {
     TextStyle numberTextStyle =
         widget.lineNumberStyle.textStyle ?? const TextStyle();
     final numberColor =
-        (styles?[rootKey]?.color ?? defaultText).withOpacity(0.7);
+    (styles?[rootKey]?.color ?? defaultText).withValues(alpha: 0.7);
 
     // Copy important attributes
     numberTextStyle = numberTextStyle.copyWith(
