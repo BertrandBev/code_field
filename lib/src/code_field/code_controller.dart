@@ -1,7 +1,7 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/services.dart'
+    show KeyEvent, KeyDownEvent, KeyRepeatEvent, LogicalKeyboardKey;
 import 'package:highlight/highlight_core.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../code_modifiers/close_block_code_modifier.dart';
 import '../code_modifiers/code_modifier.dart';
@@ -14,43 +14,46 @@ import 'editor_params.dart';
 
 class CodeController extends TextEditingController {
   Mode? _language;
+
   CodeAutoComplete? autoComplete;
 
-  /// A highlight language to parse the text with
+  /// A highlight language to parse the text with.
   Mode? get language => _language;
 
   set language(Mode? language) {
-    if (language == _language) {
-      return;
-    }
+    if (language == _language) return;
+
+    _language = language;
 
     if (language != null) {
       _languageId = language.hashCode.toString();
       highlight.registerLanguage(_languageId, language);
+    } else {
+      _languageId = '';
     }
 
-    _language = language;
     notifyListeners();
   }
 
-  /// A map of specific regexes to style
+  /// A map of specific regexes to style.
   final Map<String, TextStyle>? patternMap;
 
-  /// A map of specific keywords to style
+  /// A map of specific keywords to style.
   final Map<String, TextStyle>? stringMap;
 
-  /// Common editor params such as the size of a tab in spaces
-  ///
-  /// Will be exposed to all [modifiers]
+  /// Common editor parameters.
   final EditorParams params;
 
-  /// A list of code modifiers to dynamically update the code upon certain keystrokes
+  /// Code modifiers.
   final List<CodeModifier> modifiers;
 
   /* Computed members */
+
   String _languageId = '';
-  final _modifierMap = <String, CodeModifier>{};
-  final _styleList = <TextStyle>[];
+
+  final Map<String, CodeModifier> _modifierMap = {};
+  final List<TextStyle> _styleList = [];
+
   RegExp? _styleRegExp;
 
   String get languageId => _languageId;
@@ -58,8 +61,7 @@ class CodeController extends TextEditingController {
   CodeController({
     String? text,
     Mode? language,
-    // @Deprecated('Use CodeTheme widget to provide theme to CodeField.')
-    //     Map<String, TextStyle>? theme,
+    this.autoComplete,
     this.patternMap,
     this.stringMap,
     this.params = const EditorParams(),
@@ -71,68 +73,91 @@ class CodeController extends TextEditingController {
   }) : super(text: text) {
     this.language = language;
 
-    // Create modifier map
-    for (final el in modifiers) {
-      _modifierMap[el.char] = el;
+    for (final modifier in modifiers) {
+      _modifierMap[modifier.char] = modifier;
     }
 
-    // Build styleRegExp
+    // Build styleRegExp.
     final patternList = <String>[];
+
     if (stringMap != null) {
-      patternList.addAll(stringMap!.keys.map((e) => r'(\b' + e + r'\b)'));
+      patternList.addAll(
+        stringMap!.keys.map((e) => r'(\b' + e + r'\b)'),
+      );
       _styleList.addAll(stringMap!.values);
     }
+
     if (patternMap != null) {
-      patternList.addAll(patternMap!.keys.map((e) => '($e)'));
+      patternList.addAll(
+        patternMap!.keys.map((e) => '($e)'),
+      );
       _styleList.addAll(patternMap!.values);
     }
-    _styleRegExp = RegExp(patternList.join('|'), multiLine: true, unicode: true);
+
+    if (patternList.isNotEmpty) {
+      _styleRegExp = RegExp(
+        patternList.join('|'),
+        multiLine: true,
+        unicode: true,
+      );
+    }
   }
 
-  /// Sets a specific cursor position in the text
+  /// Sets a specific cursor position.
   void setCursor(int offset) {
     selection = TextSelection.collapsed(offset: offset);
   }
 
-  /// Replaces the current [selection] by [str]
+  /// Replaces the current selection by [str].
   void insertStr(String str) {
     final sel = selection;
-    text = text.replaceRange(selection.start, selection.end, str);
-    final len = str.length;
 
-    selection = sel.copyWith(
-      baseOffset: sel.start + len,
-      extentOffset: sel.start + len,
+    text = text.replaceRange(
+      sel.start,
+      sel.end,
+      str,
+    );
+
+    final newOffset = sel.start + str.length;
+
+    selection = TextSelection.collapsed(
+      offset: newOffset,
     );
   }
 
-  /// Remove the char just before the cursor or the selection
+  /// Removes the character just before the cursor.
   void removeChar() {
-    if (selection.start < 1) {
-      return;
-    }
+    if (selection.start < 1) return;
 
     final sel = selection;
-    text = text.replaceRange(selection.start - 1, selection.start, '');
 
-    selection = sel.copyWith(
-      baseOffset: sel.start - 1,
-      extentOffset: sel.start - 1,
+    text = text.replaceRange(
+      sel.start - 1,
+      sel.start,
+      '',
+    );
+
+    selection = TextSelection.collapsed(
+      offset: sel.start - 1,
     );
   }
 
-  /// Remove the selected text
+  /// Removes the selected text.
   void removeSelection() {
     final sel = selection;
-    text = text.replaceRange(selection.start, selection.end, '');
 
-    selection = sel.copyWith(
-      baseOffset: sel.start,
-      extentOffset: sel.start,
+    text = text.replaceRange(
+      sel.start,
+      sel.end,
+      '',
+    );
+
+    selection = TextSelection.collapsed(
+      offset: sel.start,
     );
   }
 
-  /// Remove the selection or last char if the selection is empty
+  /// Removes the selection or last character.
   void backspace() {
     if (selection.start < selection.end) {
       removeSelection();
@@ -141,31 +166,46 @@ class CodeController extends TextEditingController {
     }
   }
 
-  KeyEventResult onKey(RawKeyEvent event) {
-    if (event.isKeyPressed(LogicalKeyboardKey.tab)) {
-      text = text.replaceRange(selection.start, selection.end, '\t');
+  /// Handles keyboard events using the new KeyEvent API.
+  KeyEventResult onKeyEvent(KeyEvent event) {
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+      return KeyEventResult.ignored;
+    }
+
+    if (event.logicalKey == LogicalKeyboardKey.tab) {
+      insertStr('\t');
       return KeyEventResult.handled;
     }
 
-    if (autoComplete?.isShowing ?? false) {
-      if (event.isKeyPressed(LogicalKeyboardKey.arrowDown)) {
-        autoComplete!.current =
-            (autoComplete!.current + 1) % autoComplete!.options.length;
-        autoComplete!.panelSetState?.call(() {});
+    final completion = autoComplete;
+
+    if (completion?.isShowing ?? false) {
+      if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+        if (completion!.options.isNotEmpty) {
+          completion.current =
+              (completion.current + 1) % completion.options.length;
+          completion.panelSetState?.call(() {});
+        }
         return KeyEventResult.handled;
       }
-      if (event.isKeyPressed(LogicalKeyboardKey.arrowUp)) {
-        autoComplete!.current =
-            (autoComplete!.current - 1) % autoComplete!.options.length;
-        autoComplete!.panelSetState?.call(() {});
+
+      if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+        if (completion!.options.isNotEmpty) {
+          completion.current =
+              (completion.current - 1 + completion.options.length) %
+                  completion.options.length;
+          completion.panelSetState?.call(() {});
+        }
         return KeyEventResult.handled;
       }
-      if (event.isKeyPressed(LogicalKeyboardKey.enter)) {
-        autoComplete!.writeCurrent();
+
+      if (event.logicalKey == LogicalKeyboardKey.enter) {
+        completion!.writeCurrent();
         return KeyEventResult.handled;
       }
-      if (event.isKeyPressed(LogicalKeyboardKey.escape)) {
-        autoComplete!.hide();
+
+      if (event.logicalKey == LogicalKeyboardKey.escape) {
+        completion!.hide();
         return KeyEventResult.handled;
       }
     }
@@ -173,10 +213,13 @@ class CodeController extends TextEditingController {
     return KeyEventResult.ignored;
   }
 
-  int? _insertedLoc(String a, String b) {
+  int? _insertedLoc(String oldText, String newText) {
     final sel = selection;
 
-    if (a.length + 1 != b.length || sel.start != sel.end || sel.start < 0) {
+    if (oldText.length + 1 != newText.length ||
+        sel.start != sel.end ||
+        sel.start < 0 ||
+        sel.start >= newText.length) {
       return null;
     }
 
@@ -190,102 +233,123 @@ class CodeController extends TextEditingController {
     if (loc != null) {
       final char = newValue.text[loc];
       final modifier = _modifierMap[char];
-      final val = modifier?.updateString(super.text, selection, params);
+
+      final val = modifier?.updateString(
+        super.text,
+        selection,
+        params,
+      );
 
       if (val != null) {
-        // Update newValue
         newValue = newValue.copyWith(
           text: val.text,
           selection: val.selection,
         );
       }
     }
+
     super.value = newValue;
   }
 
-  TextSpan _processPatterns(String text, TextStyle? style) {
+  /// Processes custom regex patterns.
+  TextSpan _processPatterns(
+      String text,
+      TextStyle? style,
+      ) {
     final children = <TextSpan>[];
 
     text.splitMapJoin(
       _styleRegExp!,
-      onMatch: (Match m) {
-        if (_styleList.isEmpty) {
-          return '';
+      onMatch: (Match match) {
+        if (_styleList.isEmpty) return '';
+
+        var styleIndex = -1;
+
+        for (var i = 1; i <= match.groupCount; i++) {
+          if (match.group(i) != null) {
+            styleIndex = i - 1;
+            break;
+          }
         }
 
-        int idx;
-        for (idx = 1;
-            idx < m.groupCount &&
-                idx <= _styleList.length &&
-                m.group(idx) == null;
-            idx++) {}
+        children.add(
+          TextSpan(
+            text: match[0],
+            style: styleIndex >= 0 && styleIndex < _styleList.length
+                ? _styleList[styleIndex]
+                : style,
+          ),
+        );
 
-        children.add(TextSpan(
-          text: m[0],
-          style: _styleList[idx - 1],
-        ));
         return '';
       },
       onNonMatch: (String span) {
-        children.add(TextSpan(text: span, style: style));
+        children.add(
+          TextSpan(
+            text: span,
+            style: style,
+          ),
+        );
+
         return '';
       },
     );
 
-    return TextSpan(style: style, children: children);
+    return TextSpan(
+      style: style,
+      children: children,
+    );
   }
 
+  /// Processes syntax highlighting.
   TextSpan _processLanguage(
-    String text,
-    CodeThemeData? widgetTheme,
-    TextStyle? style,
-  ) {
-    final result = highlight.parse(text, language: _languageId);
+      String text,
+      CodeThemeData? widgetTheme,
+      TextStyle? style,
+      ) {
+    final result = highlight.parse(
+      text,
+      language: _languageId,
+    );
 
-    final nodes = result.nodes;
+    List<TextSpan> processNodes(List<Node> nodes) {
+      final children = <TextSpan>[];
 
-    final children = <TextSpan>[];
-    var currentSpans = children;
-    final stack = <List<TextSpan>>[];
+      for (final node in nodes) {
+        final nodeStyle = widgetTheme?.styles[node.className];
 
-    void traverse(Node node) {
-      var val = node.value;
-      final nodeChildren = node.children;
-      final nodeStyle = widgetTheme?.styles[node.className];
+        if (node.value != null) {
+          final value = node.value!;
 
-      if (val != null) {
-        var child = TextSpan(text: val, style: nodeStyle);
-
-        if (_styleRegExp != null) {
-          child = _processPatterns(val, nodeStyle);
-        }
-
-        currentSpans.add(child);
-      } else if (nodeChildren != null) {
-        List<TextSpan> tmp = [];
-
-        currentSpans.add(TextSpan(
-          children: tmp,
-          style: nodeStyle,
-        ));
-
-        stack.add(currentSpans);
-        currentSpans = tmp;
-
-        for (final n in nodeChildren) {
-          traverse(n);
-          if (n == nodeChildren.last) {
-            currentSpans = stack.isEmpty ? children : stack.removeLast();
+          if (_styleRegExp != null) {
+            children.add(
+              _processPatterns(value, nodeStyle ?? style),
+            );
+          } else {
+            children.add(
+              TextSpan(
+                text: value,
+                style: nodeStyle,
+              ),
+            );
           }
+        } else if (node.children != null) {
+          children.add(
+            TextSpan(
+              style: nodeStyle,
+              children: processNodes(node.children!),
+            ),
+          );
         }
       }
+
+      return children;
     }
 
-    if (nodes != null) {
-      nodes.forEach(traverse);
-    }
-
-    return TextSpan(style: style, children: children);
+    return TextSpan(
+      style: style,
+      children: processNodes(result.nodes ?? []),
+    );
   }
 
   @override
@@ -294,35 +358,44 @@ class CodeController extends TextEditingController {
     TextStyle? style,
     bool? withComposing,
   }) {
-    // Return parsing
     if (_language != null) {
-      return _processLanguage(text, CodeTheme.of(context), style);
+      return _processLanguage(
+        text,
+        CodeTheme.of(context),
+        style,
+      );
     }
+
     if (_styleRegExp != null) {
       return _processPatterns(text, style);
     }
-    return TextSpan(text: text, style: style);
+
+    return TextSpan(
+      text: text,
+      style: style,
+    );
   }
 
+  /// Creates a copy of this controller.
   CodeController copyWith({
-    Mode? _language,
+    String? text,
+    Mode? language,
     CodeAutoComplete? autoComplete,
     Map<String, TextStyle>? patternMap,
     Map<String, TextStyle>? stringMap,
     EditorParams? params,
     List<CodeModifier>? modifiers,
-    String? _languageId,
-    RegExp? _styleRegExp,
   }) {
-    return CodeController(
-      _language: _language ?? this._language,
+    final controller = CodeController(
+      text: text ?? this.text,
+      language: language ?? this.language,
       autoComplete: autoComplete ?? this.autoComplete,
       patternMap: patternMap ?? this.patternMap,
       stringMap: stringMap ?? this.stringMap,
       params: params ?? this.params,
       modifiers: modifiers ?? this.modifiers,
-      _languageId: _languageId ?? this._languageId,
-      _styleRegExp: _styleRegExp ?? this._styleRegExp,
     );
+
+    return controller;
   }
 }
