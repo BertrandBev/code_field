@@ -2,7 +2,7 @@
  * Simple example
  */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:code_text_field/code_text_field.dart';
 // Import the language & theme
 import 'package:highlight/languages/dart.dart';

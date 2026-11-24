@@ -13,6 +13,7 @@ dependencies:
   linked_scroll_controller: ^0.2.0
   highlight: ^0.7.0
   flutter_highlight: ^0.7.0
+  material_ui: ^1.0.0
 
 dev_dependencies:
   flutter_test:
